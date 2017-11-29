@@ -120,7 +120,7 @@ public class Bonus {
 		try {
 			json.put("id", this.id_objet);
 			if (Utils.testStringForJson(this.description_recette)) json.put("description", this.description_recette);
-			if (Utils.testStringForJson(this.type_objet)) json.put("username", this.type_objet);
+			if (Utils.testStringForJson(this.type_objet)) json.put("type", this.type_objet);
 			json.put("qte", this.qte);
 			json.put("puissance", this.puissance_objet);
 

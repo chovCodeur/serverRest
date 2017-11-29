@@ -23,7 +23,7 @@ import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
 import com.api.utils.Utils;
 
-@Path("/bonus")
+@Path("/bonus_dev")
 public class BonusService {
 
 	final static Logger logger = Logger.getLogger(BonusService.class.getName());
