@@ -45,7 +45,7 @@ public class ObjetService {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@PathParam("id") int id) {
+	public Response getUser(@PathParam("id") String id) {
 		ObjetDao objetDao = new ObjetDao();
 
 		ArrayList<Objet> objets = new ArrayList<Objet>();

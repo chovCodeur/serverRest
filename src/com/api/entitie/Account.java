@@ -13,18 +13,18 @@ public class Account {
 	private String username;
 	private String email;
 	private String password;
-	private int id_faction;
+	private String faction;
 	private Timestamp created_at;
 	private Timestamp updated_at;
 	private Timestamp deleted_at;
 	
-	public Account(int id, String id_global, String username, String email, String password, int id_faction, Timestamp created_at, Timestamp updated_at, Timestamp deleted_at) {
+	public Account(int id, String id_global, String username, String email, String password, String faction, Timestamp created_at, Timestamp updated_at, Timestamp deleted_at) {
 		this.id = id;
 		this.id_global = id_global;
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.id_faction = id_faction;
+		this.faction = faction;
 		this.created_at = created_at;
 		this.updated_at = updated_at;
 		this.deleted_at = deleted_at;
@@ -74,12 +74,12 @@ public class Account {
 		this.password = password;
 	}
 
-	public int getId_faction() {
-		return id_faction;
+	public String getFaction() {
+		return faction;
 	}
 
-	public void setId_faction(int id_faction) {
-		this.id_faction = id_faction;
+	public void setFaction(String faction) {
+		this.faction = faction;
 	}
 
 	public Timestamp getCreatedAT() {
@@ -111,7 +111,7 @@ public class Account {
 	@Override
 	public String toString() {
 		return "Account [id=" + id + ", globalID=" + id_global + ", username=" + username + ", email=" + email
-				+ ", password=" + password + ", id_faction=" + id_faction + ", createdAT=" + created_at + ", updatedAT="
+				+ ", password=" + password + ", faction=" + faction + ", createdAT=" + created_at + ", updatedAT="
 				+ updated_at + ", deletedAT=" + deleted_at + "]";
 	}
 
@@ -123,7 +123,7 @@ public class Account {
 			if (Utils.testStringForJson(this.username)) json.put("username", this.username);
 			if (Utils.testStringForJson(this.email))  json.put("email", this.email);
 			if (Utils.testStringForJson(this.password)) json.put("password", this.password);
-			json.put("id_faction", this.id_faction);
+			if (Utils.testStringForJson(this.faction)) json.put("faction", this.faction);
 			json.put("created_at", this.created_at);
 			json.put("updated_at", this.updated_at);
 			json.put("deleted_at", this.deleted_at);
@@ -137,7 +137,7 @@ public class Account {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("_id", this.id);
-			json.put("id_faction", "Faction"+this.id_faction);
+			if (Utils.testStringForJson(this.faction))  json.put("faction", this.faction);
 			if (Utils.testStringForJson(this.email))  json.put("email", this.email);
 			if (Utils.testStringForJson(this.username)) json.put("username", this.username);
 			if (Utils.testStringForJson(this.id_global)) json.put("globalId", this.id_global);

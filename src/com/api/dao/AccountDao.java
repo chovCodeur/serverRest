@@ -27,7 +27,7 @@ public class AccountDao {
 	private final static String QUERY_FIND_BY_MAIL = "SELECT * FROM ACCOUNT WHERE email = ?";
 
 	private final static String QUERY_FIND_BY_ID = "SELECT * FROM ACCOUNT WHERE ID = ?";
-	private final static String QUERY_INSERT = "INSERT INTO ACCOUNT (id_global, id_faction, username, password, email, created_at, updated_at, deleted_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
+	private final static String QUERY_INSERT = "INSERT INTO ACCOUNT (id_global, faction, username, password, email, created_at, updated_at, deleted_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
 	private final static String QUERY_UPDATE_PASSWORD_BY_ID = "UPDATE ACCOUNT SET password = ?, updated_at = ?  WHERE id = ?";
 
 	
@@ -239,7 +239,7 @@ public class AccountDao {
 		final String username = rset.getString("username");
 		final String email = rset.getString("email");
 		final String password = rset.getString("password");
-		final int id_faction = rset.getInt("id_faction");
+		final String faction = rset.getString("faction");
 		
 		Timestamp createdAT = rset.getTimestamp("created_at");
 		Timestamp updatedAT = rset.getTimestamp("updated_at");
@@ -257,7 +257,7 @@ public class AccountDao {
 			deletedAT = null;
 		} **/
 		
-		final Account account = new Account(id, id_global, username, email, password, id_faction, createdAT, updatedAT, deletedAT);
+		final Account account = new Account(id, id_global, username, email, password, faction, createdAT, updatedAT, deletedAT);
 		return account;
 	}
 	
@@ -274,7 +274,7 @@ public class AccountDao {
 			// create the mysql insert preparedstatement
 			stmt = con.prepareStatement(QUERY_INSERT);
 			stmt.setString(1, account.getGlobalID());
-			stmt.setInt(2, account.getId_faction());
+			stmt.setString(2, account.getFaction());
 			stmt.setString(3, account.getUsername());
 			stmt.setString(4, account.getPassword());
 			stmt.setString(5, account.getEmail());

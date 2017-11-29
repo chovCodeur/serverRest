@@ -1,4 +1,4 @@
-package com.api.service.others;
+package com.api.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,21 +17,22 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.api.dao.AccountDao;
+import com.api.dao.BonusDao;
 import com.api.entitie.Account;
+import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
-import com.api.service.AccountService;
 import com.api.utils.Utils;
 
 @Path("/bonus")
-public class Bonus {
+public class BonusService {
 
-	final static Logger logger = Logger.getLogger(Bonus.class.getName());
+	final static Logger logger = Logger.getLogger(BonusService.class.getName());
 	final static String URL_BONUS = "https://slack.com/api/api.test";
 	
 	@GET
 	@Path("/boomcraft/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttp() {
+	public Response bonusBoomcraft() {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
 		JSONObject json = new JSONObject();
@@ -46,7 +47,7 @@ public class Bonus {
 	@GET
 	@Path("/farmvillage/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response Post() {
+	public Response bonusFarmvillage() {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
 		JSONObject json = new JSONObject();
@@ -61,7 +62,7 @@ public class Bonus {
 	@GET
 	@Path("/howob/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttps() {
+	public Response bonusHowob() {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
 		JSONObject json = new JSONObject();
@@ -72,6 +73,43 @@ public class Bonus {
 		}
 		return Response.status(200).entity(json.toString()).build();
 	}
+	
+	@POST
+	@Path("/uuid")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response bonusByUuid (String value) {
+		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		jsonEnvoi = Utils.parseJsonObject(value);
+		
+		BonusDao bonusDao = new BonusDao();
+		ArrayList<Bonus> listeBonus = new ArrayList<Bonus>();
+		String uuid = new String();
+		if (jsonEnvoi.containsKey("uuid") && jsonEnvoi.get("uuid") != null) {
+			uuid = (String) jsonEnvoi.get("uuid");
+			listeBonus = bonusDao.getBonusByIdAccount(uuid);
+		}
+
+		JSONObject json = new JSONObject();
+		try {
+			for (Bonus bonus : listeBonus) {
+				json.put(String.valueOf(bonus.getId_objet()), bonus.getJson());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+	/*	if (json.length() == 0 ) {
+			try {
+				json.put("error", Utils.getJsonErrorGenerale());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} */
+		
+		return Response.status(200).entity(json.toString()).build();
+	}
+	
 	
 	public Boolean randomBool() {
 		

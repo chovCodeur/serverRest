@@ -8,18 +8,27 @@ public class Objet {
 	private int id_objet;
 	private String nom_objet;
 	private TypeObjet type_objet;
-	
+	private int puissance_objet;
 	
 	/**
 	 * @param id_objet
 	 * @param nom_objet
 	 * @param type_objet
 	 */
-	public Objet(int id_objet, String nom_objet, TypeObjet type_objet) {
+	public Objet(int id_objet, String nom_objet, TypeObjet type_objet, int puissance_objet ) {
 		this.id_objet = id_objet;
 		this.nom_objet = nom_objet;
 		this.type_objet = type_objet;
+		this.puissance_objet = puissance_objet;
+
 	}
+	public int getPuissance_objet() {
+		return puissance_objet;
+	}
+	public void setPuissance_objet(int puissance_objet) {
+		this.puissance_objet = puissance_objet;
+	}
+	
 	public Objet() {
 	}
 	public int getId_objet() {
@@ -55,7 +64,7 @@ public class Objet {
 	}
 	@Override
 	public String toString() {
-		return "Objet [id_objet=" + id_objet + ", nom_objet=" + nom_objet + ", type_objet=" + type_objet + "]";
+		return "Objet [id_objet=" + id_objet + ", nom_objet=" + nom_objet + ", type_objet=" + type_objet +", puissance_objet=" + puissance_objet + "]";
 	}
 	
 }

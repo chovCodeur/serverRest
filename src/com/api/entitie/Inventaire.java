@@ -5,7 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 public class Inventaire {
 
-	private int id_user;
+	private String id_user;
 	private int id_objet;
 	private int qte;
 	
@@ -15,7 +15,7 @@ public class Inventaire {
 	 * @param id_objet
 	 * @param quantite
 	 */
-	public Inventaire(int id_user, int id_objet, int quantite) {
+	public Inventaire(String id_user, int id_objet, int quantite) {
 		this.id_user = id_user;
 		this.id_objet = id_objet;
 		this.qte = quantite;
@@ -25,10 +25,10 @@ public class Inventaire {
 		
 	}
 	
-	public int getId_user() {
+	public String getId_user() {
 		return id_user;
 	}
-	public void setId_user(int id_user) {
+	public void setId_user(String id_user) {
 		this.id_user = id_user;
 	}
 	public int getId_objet() {

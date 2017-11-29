@@ -23,7 +23,6 @@ public class InventaireDao {
 	private final static String QUERY_FIND_BY_ID_ACCOUNT_AND_BY_ID_OBJET = 	"SELECT * FROM INVENTAIRE WHERE id_user = ? AND id_objet = ?";
 	private final static String QUERY_INSERT = "INSERT INTO INVENTAIRE (id_objet, id_user, qte) values (?, ?, ?)";
 	private final static String QUERY_UPDATE = "UPDATE INVENTAIRE SET qte = ? WHERE id_user = ? AND id_objet = ?";
-
 	
 	final static Logger logger = Logger.getLogger(InventaireDao.class.getName());
 
@@ -101,7 +100,7 @@ public class InventaireDao {
 	
 	private Inventaire mappingInventaire(final ResultSet rset) throws SQLException {
 		final int id_objet = rset.getInt("id_objet");
-		final int id_user = rset.getInt("id_user");
+		final String id_user = rset.getString("id_global");
 		final int qte = rset.getInt("qte");
 		final Inventaire inventaire = new Inventaire(id_user, id_objet, qte);
 		return inventaire;
@@ -125,12 +124,13 @@ public class InventaireDao {
 					logger.info("nb"+nbObjetDejaPresent);
 
 					stmt.setInt(1, nbObjetDejaPresent+inventaire.getQuantite());
-					stmt.setInt(2, inventaire.getId_user());
-					stmt.setInt(3, inventaire.getId_objet());	
+					stmt.setString(2, inventaire.getId_user());
+					stmt.setInt(3, inventaire.getId_objet());
+					// TODO Verifier requete 
 			} else {
 				stmt = con.prepareStatement(QUERY_INSERT);
 				stmt.setInt(1, inventaire.getId_objet());
-				stmt.setInt(2, inventaire.getId_user());
+				stmt.setString(2, inventaire.getId_user());
 				stmt.setInt(3, inventaire.getQuantite());
 			}
 			
@@ -197,4 +197,6 @@ public class InventaireDao {
 		}
 		return inventaires;
 	}
+	
+	
 }
