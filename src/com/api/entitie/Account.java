@@ -1,6 +1,5 @@
 package com.api.entitie;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 import org.codehaus.jettison.json.JSONException;
@@ -133,5 +132,21 @@ public class Account {
 		}
 		return json;
 	}
-
+	
+	public JSONObject getJsonForApi() {
+		JSONObject json = new JSONObject();
+		try {
+			json.put("_id", this.id);
+			json.put("id_faction", "Faction"+this.id_faction);
+			if (Utils.testStringForJson(this.email))  json.put("email", this.email);
+			if (Utils.testStringForJson(this.username)) json.put("username", this.username);
+			if (Utils.testStringForJson(this.id_global)) json.put("globalId", this.id_global);
+			json.put("deleted_at", this.deleted_at);
+			json.put("created_at", this.created_at);
+			json.put("updated_at", this.updated_at);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return json;
+	}
 }

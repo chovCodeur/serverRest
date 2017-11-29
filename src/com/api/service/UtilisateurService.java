@@ -29,21 +29,4 @@ public class UtilisateurService {
 
 		return Response.status(200).entity(result).build();
 	}
-
-	@GET
-	@Path("/pingAPI")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response testReponse(InputStream incomingData) {
-		logger.info("Appel testReponse");
-		String result = "L'API est a l'ecoute";
-		return Response.status(200).entity(result).build();
-	}
-
-	@POST
-	@Path("/{id}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response postUser(@PathParam("id") int id) {
-		logger.info("Appel postUser");
-		return Response.status(200).entity("OK").build();
-	}
 }

@@ -53,5 +53,9 @@ public class Objet {
 		}
 		return json;
 	}
+	@Override
+	public String toString() {
+		return "Objet [id_objet=" + id_objet + ", nom_objet=" + nom_objet + ", type_objet=" + type_objet + "]";
+	}
 	
 }

@@ -21,16 +21,13 @@ public class InventaireService {
 	final static Logger logger = Logger.getLogger(InventaireService.class.getName());
 
 	@GET
-	@Path("/getAllInventaires")
+	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllInventaires() {
-		logger.info("Appel TEST_DEV getAllInventaires");
 		InventaireDao inventaireDao = new InventaireDao();
 
 		ArrayList<Inventaire> inventaires = new ArrayList<Inventaire>();
-		logger.debug("MiPa avant appel DAO");
 		inventaires = inventaireDao.getAllInventaires();
-		logger.info("Création du JSON ");
 
 		JSONObject json = new JSONObject();
 		try {
@@ -42,7 +39,6 @@ public class InventaireService {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		logger.debug("JSON  créé : " + json.toString());
 		return Response.status(200).entity(json.toString()).build();
 	}
 }

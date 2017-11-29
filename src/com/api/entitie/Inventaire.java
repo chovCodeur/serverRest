@@ -55,4 +55,9 @@ public class Inventaire {
 		}
 		return json;
 	}
+
+	@Override
+	public String toString() {
+		return "Inventaire [id_user=" + id_user + ", id_objet=" + id_objet + ", qte=" + qte + "]";
+	}
 }

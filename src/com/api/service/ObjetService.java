@@ -22,16 +22,13 @@ public class ObjetService {
 	final static Logger logger = Logger.getLogger(InventaireService.class.getName());
 
 	@GET
-	@Path("/getAllObjets")
+	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllObjets() {
-		logger.info("Appel TEST_DEV getAllObjets");
 		ObjetDao objetDao = new ObjetDao();
 
 		ArrayList<Objet> objets = new ArrayList<Objet>();
-		logger.debug("MiPa avant appel DAO");
 		objets = objetDao.getAllObjets();
-		logger.info("Création du JSON ");
 
 		JSONObject json = new JSONObject();
 		try {
@@ -41,35 +38,27 @@ public class ObjetService {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		logger.debug("JSON  créé : " + json.toString());
 		return Response.status(200).entity(json.toString()).build();
 	}
 	
 
 	@GET
-	@Path("/getObjetsByAccount/{id}")
+	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUser(@PathParam("id") int id) {
-		logger.info("Appel getUser");
 		ObjetDao objetDao = new ObjetDao();
 
 		ArrayList<Objet> objets = new ArrayList<Objet>();
-		logger.debug("MiPa avant appel DAO");
 		objets = objetDao.getObjetByIdAccount(id);
-		logger.info("Création du JSON ");
 
 		JSONObject json = new JSONObject();
 		try {
 			for (Objet objet : objets) {
-					logger.info("Construction"+objet.getJson());
-					logger.info("Constructionid"+String.valueOf(objet.getId_objet()));
 					json.put(String.valueOf(objet.getId_objet()), objet.getJson());
 				}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		logger.debug("JSON  créé : " + json.toString());
 		return Response.status(200).entity(json.toString()).build();
 	}
-
 }

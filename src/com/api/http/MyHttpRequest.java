@@ -1,4 +1,4 @@
-package com.api.others;
+package com.api.http;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -24,17 +24,16 @@ public class MyHttpRequest {
 	}
 	private static final Logger logger = Logger.getLogger(MyHttpRequest.class.getName());
 
-	public JSONObject getJsonByHttp (String urlHttp) throws IOException {
-		URL url = new URL(urlHttp);
+	public JSONObject getJsonByHttp (String urlHttp) {
 		JSONObject jObject = new JSONObject();
 		
 		try {
+			URL url = new URL(urlHttp);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
 
 			int responseCode = con.getResponseCode();
-			logger.info("GET Response Code :: " + responseCode);
-			if (responseCode == HttpURLConnection.HTTP_OK) { // success
+			if (responseCode == HttpURLConnection.HTTP_OK) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String inputLine;
 				StringBuffer response = new StringBuffer();
@@ -45,18 +44,20 @@ public class MyHttpRequest {
 				in.close();
 
 				jObject = new JSONObject(response.toString());
-				logger.debug(" trouvé : " + jObject.toString());
 
 			} else {
-				logger.error("GET request not worked");
+				
 			}
 		} catch (ConnectException e) {
-			// e.printStackTrace();
-			logger.error("Erreur de connexion");
+			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return jObject;
 	}
 	
@@ -78,12 +79,10 @@ public class MyHttpRequest {
 					response.append(inputLine);
 				}
 				in.close();
-
 				jObject = new JSONObject(response.toString());
-				System.out.println(" trouvé : " + jObject.toString());
 
 			} else {
-				System.out.println("GET request not worked");
+				
 			}
 
 		} catch (MalformedURLException e) {
@@ -123,60 +122,49 @@ public class MyHttpRequest {
 	}
 	
 	
-	public JSONObject getJsonByPostWithJsonBody (String url, org.json.simple.JSONObject jsonObject) throws Exception {
-
-		//String url = "http://howob.masi-henallux.be/api/auth/signin/";
-		URL obj = new URL(url);
-		System.out.println("MiPaAaa");
+	public JSONObject getJsonByPostWithJsonBody (String url, org.json.simple.JSONObject jsonObject) {
+		
 		JSONObject jsonObjectReponse = new JSONObject();
-		
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-		con.setRequestMethod("POST");
-		//con.setRequestProperty("User-Agent", USER_AGENT);
-		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		con.setRequestProperty("Content-Type","application/json");
-
-		//JSONObject jsonObject = new JSONObject();
-		//jsonObject.put("username", "test");
-		//jsonObject.put("password", "test");
-
-		
-		con.setDoOutput(true);
-		
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(jsonObject.toString());
-		wr.flush();
-		wr.close();
-		
-		int responseCode = con.getResponseCode();
-		System.out.println("Response Code : " + responseCode);
+		try {
+			URL obj = new URL(url);
 			
-		if (responseCode == HttpURLConnection.HTTP_OK) {
-			System.out.println("nSending 'POST' request to URL : " + url);
-			System.out.println("Post Data : " + jsonObject.toString());
-			System.out.println("Response Code : " + responseCode);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String output;
-			StringBuffer response = new StringBuffer();
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+			con.setRequestProperty("Content-Type","application/json");
 
-			while ((output = in.readLine()) != null) {
-				response.append(output);
+			con.setDoOutput(true);
+			
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.writeBytes(jsonObject.toString());
+			wr.flush();
+			wr.close();
+			
+			int responseCode = con.getResponseCode();			
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String output;
+				StringBuffer response = new StringBuffer();
+
+				while ((output = in.readLine()) != null) {
+					response.append(output);
+				}
+				in.close();
+				
+				jsonObjectReponse = new JSONObject(response.toString());
+			} else {
+
 			}
-			in.close();
-			
-
-			jsonObjectReponse = new JSONObject(response.toString());
-			System.out.println(" trouvé : " + jsonObjectReponse.toString());
-
-			//printing result from response
-			System.out.println(response.toString());
-		} else {
-
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
 		
 		return jsonObjectReponse;
 	}
-
 }
