@@ -23,11 +23,10 @@ import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
 import com.api.utils.Utils;
 
-@Path("/bonus_dev")
+@Path("/bonus")
 public class BonusService {
 
 	final static Logger logger = Logger.getLogger(BonusService.class.getName());
-	final static String URL_BONUS = "https://slack.com/api/api.test";
 	
 	@GET
 	@Path("/boomcraft/{uid}")
@@ -37,6 +36,8 @@ public class BonusService {
 		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
 		JSONObject json = new JSONObject();
 		try {
+			
+			
 			json.put("boomcraft", randomBool());
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -62,53 +63,81 @@ public class BonusService {
 	@GET
 	@Path("/howob/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response bonusHowob() {
+	public Response bonusHowob(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		JSONObject json = new JSONObject();
+		
+		System.out.println("Ahttp://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid);
+		JSONObject json = myHttpRequest.getJsonByHttp("http://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid);
+		JSONObject jsonRetour = new JSONObject();
+		int qte = 0;
 		try {
-			json.put("howob", randomBool());
+			if(!json.isNull("qte")) {
+				qte = json.getInt("qte");
+			}
+			System.out.println(qte);
+			if (qte > 0) {
+				jsonRetour.put("howob", true);
+			} else {
+				jsonRetour.put("howob", false);
+
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return Response.status(200).entity(json.toString()).build();
+		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 	
 	@POST
-	@Path("/uuid")
+	@Path("/notifier")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response bonusByUuid (String value) {
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response notifierBonus (String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		MyHttpRequest myHttpRequest = new MyHttpRequest();
+
 		jsonEnvoi = Utils.parseJsonObject(value);
+		String uuid = null;
 		
-		BonusDao bonusDao = new BonusDao();
-		ArrayList<Bonus> listeBonus = new ArrayList<Bonus>();
-		String uuid = new String();
 		if (jsonEnvoi.containsKey("uuid") && jsonEnvoi.get("uuid") != null) {
 			uuid = (String) jsonEnvoi.get("uuid");
-			listeBonus = bonusDao.getBonusByIdAccount(uuid);
+		} else {
+			return Response.status(500).entity("KO").build();
+		}
+		
+		org.json.simple.JSONObject jsonRetour = new org.json.simple.JSONObject();
+		Boolean tmp = false;
+		if (jsonEnvoi.containsKey("howob") && jsonEnvoi.get("howob") != null) {
+			tmp = (Boolean) jsonEnvoi.get("howob");
+			if (tmp) {
+				jsonRetour.put("qte", 1);
+				myHttpRequest.getJsonByPostWithJsonBody("http://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid, jsonRetour);
+			}
+		}
+		
+		jsonRetour = new org.json.simple.JSONObject();
+		tmp = false;
+		if (jsonEnvoi.containsKey("farmvillage") && jsonEnvoi.get("farmvillage") != null) {
+			tmp = (Boolean) jsonEnvoi.get("farmvillage");
+
+			if (tmp) {
+				
+				// On appelle le FARMVILLAGE URL
+			}
+		}
+		
+		jsonRetour = new org.json.simple.JSONObject();
+		tmp = false;
+		if (jsonEnvoi.containsKey("howob") && jsonEnvoi.get("howob") != null) {
+			tmp = (Boolean) jsonEnvoi.get("howob");
+			if (tmp) {
+				// On appelle le FARMVILLAGE URL
+			}
 		}
 
-		JSONObject json = new JSONObject();
-		try {
-			for (Bonus bonus : listeBonus) {
-				json.put(String.valueOf(bonus.getId_objet()), bonus.getJson());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 		
-	/*	if (json.length() == 0 ) {
-			try {
-				json.put("error", Utils.getJsonErrorGenerale());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} */
-		
-		return Response.status(200).entity(json.toString()).build();
+		return Response.status(200).entity("ok").build();
 	}
+	
 	
 	
 	public Boolean randomBool() {

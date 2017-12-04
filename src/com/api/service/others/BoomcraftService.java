@@ -17,7 +17,9 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.api.dao.AccountDao;
+import com.api.dao.BonusDao;
 import com.api.entitie.Account;
+import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
 import com.api.service.AccountService;
 import com.api.utils.Utils;
@@ -26,44 +28,75 @@ import com.api.utils.Utils;
 public class BoomcraftService {
 
 	final static Logger logger = Logger.getLogger(BoomcraftService.class.getName());
-	final static String URL_BONUS = "https://slack.com/api/api.test";
+
+	@GET
+	@Path("/potions/{uuid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPotionsByUuidGet(@PathParam("uuid") String uuid) {
+		System.out.println("SALUT");
+		if (uuid == null || uuid.equals("")) {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul")).build();
+		}
+		
+		BonusDao bonusDao = new BonusDao();
+		ArrayList<Bonus> listeBonus = new ArrayList<Bonus>();
+		
+		listeBonus = bonusDao.getBonusByUuidAccount(uuid);
+		
+
+		JSONObject json = new JSONObject();
+		try {
+			for (Bonus bonus : listeBonus) {
+				json.put(String.valueOf(bonus.getId_objet()), bonus.getJson());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return Response.status(200).entity(json.toString()).build();
+	}
 	
-	@GET
-	@Path("/bonus")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttp() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		return Response.status(200).entity(json.toString()).build();
-	}
-
 	@POST
-	@Path("/testHTTP")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response Post() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		return Response.status(200).entity(json.toString()).build();
-	}
-
-	@GET
-	@Path("/testHTTPS")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttps() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		return Response.status(200).entity(json.toString()).build();
-	}
-
-	@POST
-	@Path("/testHttpWithJSON")
+	@Path("/potions/{uuid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttpWithJSON(String value) {
+	public Response getPotionsByUuidPost (@PathParam("uuid") String uuid, String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		jsonEnvoi = Utils.parseJsonObject(value);
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject jsonRetour = myHttpRequest.getJsonByPostWithJsonBody(URL_BONUS, jsonEnvoi);
-		return Response.status(200).entity(jsonRetour.toString()).build();
+		
+		if (uuid == null || uuid.equals("")) {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul")).build();
+		}
+		
+		BonusDao bonusDao = new BonusDao();
+
+		int idPotion = 0;
+		int qtePotion = 0;
+		if (jsonEnvoi.containsKey("id") && jsonEnvoi.get("id") != null) {
+			idPotion = (int) jsonEnvoi.get("id");
+			if (idPotion == 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant de la potion est nul")).build();
+			}
+		}
+
+		if (jsonEnvoi.containsKey("qte") && jsonEnvoi.get("qte") != null) {
+			qtePotion = (int) jsonEnvoi.get("qte");
+			if (qtePotion == 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité de la potion est nulle")).build();
+			}
+		}
+		
+		Boolean retour = bonusDao.updateInventaireByUuid(qtePotion, idPotion, uuid);
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("success", retour);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return Response.status(200).entity(json.toString()).build();
 	}
+	
+	
 }

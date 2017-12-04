@@ -25,7 +25,7 @@ public class ObjetDao {
 	private final static String QUERY_COUNT_BY_ID_ACCOUNT_AND_BY_ID_OBJET = "SELECT qte FROM INVENTAIRE WHERE id_global = ? AND id_objet = ?";
 	private final static String QUERY_PRESENT_BY_ID_ACCOUNT_AND_BY_ID_OBJET = "SELECT count(*) as nb FROM INVENTAIRE WHERE id_user = ? AND id_objet = ?";
 
-	private final static String QUERY_INSERT = "INSERT INTO OBJET (id_objet, name_objet, type_objet, puissance_objet) values (?, ?, ?, ?)";
+	private final static String QUERY_INSERT = "INSERT INTO OBJET (id_objet, nom_objet, type_objet, puissance_objet) values (?, ?, ?, ?)";
 	private final static String QUERY_DELETE_BY_ID = "DELETE FROM OBJET WHERE id_objet = ?";
 
 
@@ -142,7 +142,7 @@ public class ObjetDao {
 
 	private Objet mappingObjet(final ResultSet rset) throws SQLException {
 		final int id_objet = rset.getInt("id_objet");
-		final String nom_objet = rset.getString("name_objet");
+		final String nom_objet = rset.getString("nom_objet");
 		final String nom_type_objet = rset.getString("type_objet");
 		final TypeObjet type_objet = TypeObjet.valueOf(nom_type_objet);// TypeObjet.POTION;
 		final int puissance_objet = rset.getInt("puissance_objet");;// .POTION;

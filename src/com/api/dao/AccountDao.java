@@ -29,6 +29,7 @@ public class AccountDao {
 	private final static String QUERY_FIND_BY_ID = "SELECT * FROM ACCOUNT WHERE ID = ?";
 	private final static String QUERY_INSERT = "INSERT INTO ACCOUNT (id_global, faction, username, password, email, created_at, updated_at, deleted_at) values (?, ?, ?, ?, ?, ?, ?, ?)";
 	private final static String QUERY_UPDATE_PASSWORD_BY_ID = "UPDATE ACCOUNT SET password = ?, updated_at = ?  WHERE id = ?";
+	private final static String INSERT_MOT_DE_PASSE_BY_ID = "INSERT INTO NOUVEAU_MDP (ID, FLAG) values (?, ?)";
 
 	
 	private final static String QUERY_UPDATE_MOT_DE_PASSE_BY_ID = "UPDATE NOUVEAU_MDP SET FLAG = ? WHERE id = ?";
@@ -283,6 +284,9 @@ public class AccountDao {
 			stmt.setDate(8, null);
 
 			stmt.execute();
+			
+			Account accountInsere = getAccountByMail(account.getEmail());
+			createFlag(accountInsere.getId(), "N");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			errorInsert = true;
@@ -425,4 +429,48 @@ public class AccountDao {
 		
 		return flag;
 	}
+	
+	/**
+	 * Permet de créer une ligne dans la table NOUVEAU_MDP (gestion de la génération des nouveaux mot de passe) 
+	 * @param id
+	 * @param flag
+	 * @return <code>true</code> si tout est ok et <code>false</code> en cas d'erreur
+	 */
+	public Boolean createFlag(int id, String flag) {
+		Connection con = null;
+		PreparedStatement stmt = null;
+		Boolean errorUpdate = false;
+		try {
+			con = Connecteur.getConnexion();
+			stmt = con.prepareStatement(INSERT_MOT_DE_PASSE_BY_ID);
+			stmt.setInt(1, id);		
+			stmt.setString(2, flag);
+
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			errorUpdate = true;
+			e.printStackTrace();
+			
+		} finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return errorUpdate;
+	}
+	
+	
 }

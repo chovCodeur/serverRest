@@ -1,10 +1,12 @@
 package com.api.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
@@ -15,10 +17,10 @@ import com.api.entitie.Inventaire;
 public class BonusDao {
 	final static Logger logger = Logger.getLogger(BonusDao.class.getName()); //UNIXTIME(colonne_timestamp) as valeur_datetime
 
-	private final static String QUERY_SELECT_POTION_BY_UID ="SELECT OBJET.id_objet, qte, nom_recette, description, puissance_objet, type_objet FROM INVENTAIRE INNER JOIN OBJET ON INVENTAIRE.id_objet = OBJET.id_objet INNER JOIN RECETTE ON RECETTE.id_objet = OBJET.id_objet WHERE INVENTAIRE.id_global = ? AND type_objet in ('potion','amelioration')";
-	private final static String QUERY_SELECT_AMELIORATION_BY_UID ="";
+	private final static String QUERY_SELECT_POTION_BY_UID ="SELECT OBJET.id_objet, qte, nom_recette, description, puissance_objet, type_objet FROM INVENTAIRE INNER JOIN OBJET ON INVENTAIRE.id_objet = OBJET.id_objet INNER JOIN RECETTE ON RECETTE.id_objet = OBJET.id_objet WHERE INVENTAIRE.id_global = ? AND type_objet in ('potion')";
+	private final static String QUERY_UPDATE_INVENTAIRE ="UPDATE INVENTAIRE SET qte = ? WHERE id_objet = ? and id_user = ? ";
 
-	public ArrayList<Bonus> getBonusByIdAccount(String id_global) {
+	public ArrayList<Bonus> getBonusByUuidAccount(String id_global) {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		ArrayList<Bonus> listeBonus = new ArrayList<Bonus>();
@@ -26,6 +28,7 @@ public class BonusDao {
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(QUERY_SELECT_POTION_BY_UID);
 			stmt.setString(1, id_global);
+			System.out.println(stmt.toString());
 
 			final ResultSet rset = stmt.executeQuery();
 			Bonus bonus = new Bonus();
@@ -53,6 +56,45 @@ public class BonusDao {
 			}
 		}
 		return listeBonus;
+	}
+	
+
+	public Boolean updateInventaireByUuid(int qte, int idPotion, String uuid) {
+		Connection con = null;
+		PreparedStatement stmt = null;
+		Boolean errorUpdate = false;
+		try {
+			con = Connecteur.getConnexion();
+			stmt = con.prepareStatement(QUERY_UPDATE_INVENTAIRE);
+
+			stmt.setInt(1, qte);
+			stmt.setInt(2, idPotion);
+			stmt.setString(3, uuid);
+
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			errorUpdate = true;
+			e.printStackTrace();
+			
+		} finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return errorUpdate;
 	}
 	
 	private Bonus mappingBonus(final ResultSet rset) throws SQLException {

@@ -16,6 +16,5 @@
     <servlet-mapping>
         <servlet-name>RestServer-serlvet</servlet-name>
         <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
-    
+    </servlet-mapping>   
 </web-app>

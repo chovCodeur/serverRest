@@ -1,5 +1,6 @@
 package com.api.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -24,24 +25,29 @@ import com.api.utils.Utils;
 @Path("/account")
 public class AccountService {
 
-	private static ResourceBundle messageProperties = ResourceBundle.getBundle("message");
+	// private static ResourceBundle messageProperties =
+	// ResourceBundle.getBundle("message");
 
 	final static Logger logger = Logger.getLogger(AccountService.class.getName());
 
-	/*
-	 * @GET
-	 * 
-	 * @Path("/getAll")
-	 * 
-	 * @Produces(MediaType.APPLICATION_JSON) public Response getAllUsers() {
-	 * AccountDao accountDao = new AccountDao();
-	 * 
-	 * ArrayList<Account> accounts = new ArrayList<Account>(); accounts =
-	 * accountDao.getAllAccounts(); JSONObject json = new JSONObject(); try { for
-	 * (Account account : accounts) { json.put(String.valueOf(account.getId()),
-	 * account.getJson()); } } catch (JSONException e) { e.printStackTrace(); }
-	 * return Response.status(200).entity(json.toString()).build(); }
-	 */
+	@GET
+	@Path("/getAll")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllUsers() {
+		AccountDao accountDao = new AccountDao();
+
+		ArrayList<Account> accounts = new ArrayList<Account>();
+		accounts = accountDao.getAllAccounts();
+		JSONObject json = new JSONObject();
+		try {
+			for (Account account : accounts) {
+				json.put(String.valueOf(account.getId()), account.getJson());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return Response.status(200).entity(json.toString()).build();
+	}
 
 	@GET
 	@Path("/username/{username}")
@@ -54,7 +60,7 @@ public class AccountService {
 			json = account.getJson();
 		} else {
 			try {
-				json.put("error", messageProperties.getString("api.error.compte.aucun"));
+				json.put("a", "a");// "error", messageProperties.getString("api.error.compte.aucun"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -73,7 +79,7 @@ public class AccountService {
 			json = account.getJson();
 		} else {
 			try {
-				json.put("error", messageProperties.getString("api.error.compte.aucun"));
+				json.put("error", "a");// messageProperties.getString("api.error.compte.aucun"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -85,7 +91,6 @@ public class AccountService {
 	@Path("/id/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserById(@PathParam("id") String id) {
-		System.out.println("____MiPA______" + id);
 		AccountDao accountDao = new AccountDao();
 		Account account = accountDao.getAccountById(Integer.valueOf(id));
 		JSONObject json = new JSONObject();
@@ -93,7 +98,7 @@ public class AccountService {
 			json = account.getJson();
 		} else {
 			try {
-				json.put("error", messageProperties.getString("api.error.compte.aucun"));
+				json.put("error", "a");// messageProperties.getString("api.error.compte.aucun"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -110,45 +115,49 @@ public class AccountService {
 		jsonEnvoi = Utils.parseJsonObject(value);
 		AccountDao accountDao = new AccountDao();
 		Account account = new Account();
-		
+
 		String username = new String();
 		if (jsonEnvoi.containsKey("username") && jsonEnvoi.get("username") != null) {
 			username = (String) jsonEnvoi.get("username");
 			account = accountDao.getAccountByUsername(username);
+		} else {
+			return Response.status(200)
+					.entity(Utils.getJsonError("username null", 401, "L'username ne peut être null").toString())
+					.build();
 		}
 
 		String password = new String();
 		if (jsonEnvoi.containsKey("password") && jsonEnvoi.get("password") != null) {
 			password = (String) jsonEnvoi.get("password");
+		} else {
+			return Response.status(200)
+					.entity(Utils.getJsonError("password null", 401, "Le password ne peut être null").toString())
+					.build();
 		}
-
 
 		JSONObject jsonRetour = new JSONObject();
 		if (account != null && account.getId() != 0) {
 			try {
-				if (account.getPassword().equals(password)) {
+				if (account.getPassword().equals(Utils.get_SHA_512_SecurePassword(password))) {
 					jsonRetour.put("user", account.getJsonForApi());
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		if (jsonRetour.length() == 0 ) {
-			try {
-				jsonRetour.put("error", Utils.getJsonError());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+
+		if (jsonRetour.length() == 0) {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "Le compte n'existe pas").toString())
+					.build();
 		}
 		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
-	
+
 	@POST
-	@Path("/exist")
+	@Path("/existing")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testExistAccount(String value) {
+	public Response existing(String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		jsonEnvoi = Utils.parseJsonObject(value);
 		AccountDao accountDao = new AccountDao();
@@ -165,7 +174,6 @@ public class AccountService {
 			}
 		}
 
-
 		String mail = new String();
 		if (jsonEnvoi.containsKey("email") && jsonEnvoi.get("email") != null) {
 			mail = (String) jsonEnvoi.get("email");
@@ -175,24 +183,258 @@ public class AccountService {
 			}
 		}
 
-
 		JSONObject jsonRetour = new JSONObject();
-		
+
 		try {
-			jsonRetour.put("mailExiste", mailExiste);
-			jsonRetour.put("usernameExiste", usernameExiste);
+			jsonRetour.put("email", mailExiste);
+			jsonRetour.put("username", usernameExiste);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
-		
-		if (jsonRetour.length() == 0 ) {
+
+		return Response.status(200).entity(jsonRetour.toString()).build();
+	}
+
+	@POST
+	@Path("/signinAutreJeu")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response signinAutreJeu(String value) {
+		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		jsonEnvoi = Utils.parseJsonObject(value);
+		System.out.println(jsonEnvoi.toJSONString());
+		String username = new String();
+		if (jsonEnvoi.containsKey("username") && jsonEnvoi.get("username") != null) {
+			username = (String) jsonEnvoi.get("username");
+			if (username == null || username.equals("")) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "L'username est vide").toString())
+						.build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "L'username est vide").toString())
+					.build();
+
+		}
+
+		String password = new String();
+		if (jsonEnvoi.containsKey("password") && jsonEnvoi.get("password") != null) {
+			password = (String) jsonEnvoi.get("password");
+			if (password == null || password.equals("")) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "Le password est vide").toString())
+						.build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "Le password est vide").toString())
+					.build();
+		}
+
+		JSONObject jsonRetourTemporaire = new JSONObject();
+		MyHttpRequest httpRequest = new MyHttpRequest();
+
+		jsonRetourTemporaire = httpRequest.getJsonByPostWithJsonBody("http://howob.masi-henallux.be/api/auth/signin",
+				jsonEnvoi);
+
+		JSONObject jsonRetour = new JSONObject();
+
+		try {
+			if (jsonRetourTemporaire.isNull("user")) {
+				jsonRetour.put("signin", false);
+			} else {
+				jsonRetour.put("signin", true);
+				if (jsonRetourTemporaire.isNull("uuid_ailleurs")) {
+					jsonRetour.put("uuid_ailleurs", jsonRetourTemporaire.getJSONObject("user").get("globalId"));
+				}
+
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println(jsonRetour.toString());
+
+		return Response.status(200).entity(jsonRetour.toString()).build();
+	}
+
+	@POST
+	@Path("/existingAutreJeu")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response existingAutreJeu(String value) {
+		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		jsonEnvoi = Utils.parseJsonObject(value);
+
+		String username = new String();
+		if (jsonEnvoi.containsKey("username") && jsonEnvoi.get("username") != null) {
+			username = (String) jsonEnvoi.get("username");
+			if (username == null || username.equals("")) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "L'username est vide").toString())
+						.build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "L'username est vide").toString())
+					.build();
+
+		}
+
+		String email = new String();
+		if (jsonEnvoi.containsKey("email") && jsonEnvoi.get("email") != null) {
+			email = (String) jsonEnvoi.get("email");
+			if (email == null || email.equals("")) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "Le email est vide").toString())
+						.build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "Le email est vide").toString())
+					.build();
+		}
+
+		JSONObject jsonRetour = new JSONObject();
+		if (appelerExistingAutreJeu("http://howob.masi-henallux.be/api/auth/existing", jsonEnvoi)) {
 			try {
-				jsonRetour.put("error", Utils.getJsonErrorGenerale());
+				jsonRetour.put("existing", "howob");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+
+		/*
+		 * if (appelerExistingAutreJeu(
+		 * "http://boomcraft.masi-henallux.be/api/auth/existing", jsonEnvoi)) { try {
+		 * jsonRetour.put("existing", "boomcraft"); } catch (JSONException e) {
+		 * e.printStackTrace(); } }
+		 * 
+		 * if (appelerExistingAutreJeu(
+		 * "http://farmvillage.masi-henallux.be/api/auth/existing", jsonEnvoi)) { try {
+		 * jsonRetour.put("existing", "farmvillage"); } catch (JSONException e) {
+		 * e.printStackTrace(); } }
+		 */
+
+		if (jsonRetour.length() == 0) {
+			try {
+				jsonRetour.put("existing", "null");
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
+
+	private Boolean appelerExistingAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi) {
+		JSONObject jsonRetourIntermediaire = new JSONObject();
+		MyHttpRequest httpRequest = new MyHttpRequest();
+
+		jsonRetourIntermediaire = httpRequest.getJsonByPostWithJsonBody(url, jsonEnvoi);
+
+		if (!jsonRetourIntermediaire.isNull("email")) {
+			try {
+				Boolean mailExist = (Boolean) jsonRetourIntermediaire.get("email");
+				if (mailExist) {
+					return true;
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (!jsonRetourIntermediaire.isNull("username")) {
+			try {
+				Boolean usernameExist = (Boolean) jsonRetourIntermediaire.get("username");
+				if (usernameExist) {
+					return true;
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return false;
+	}
+
+	@POST
+	@Path("/insert")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response insertNewAccount(String value) {
+		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		jsonEnvoi = Utils.parseJsonObject(value);
+
+		String id_global = (String) jsonEnvoi.get("id_global");
+		String username = (String) jsonEnvoi.get("username");
+		String email = (String) jsonEnvoi.get("email");
+		String password = (String) jsonEnvoi.get("password");
+
+		String passwordHash = Utils.get_SHA_512_SecurePassword(password);
+		String faction = (String) jsonEnvoi.get("faction");
+		Timestamp created_at = (Timestamp) jsonEnvoi.get("created_at");
+		Timestamp updated_at = (Timestamp) jsonEnvoi.get("updated_at");
+		Timestamp deleted_at = (Timestamp) jsonEnvoi.get("deleted_at");
+
+		Account account = new Account(0, id_global, username, email, passwordHash, faction, created_at, updated_at,
+				deleted_at);
+
+		AccountDao accountDao = new AccountDao();
+		Boolean insertion = accountDao.insertNewAccount(account);
+
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put("error_insert", insertion);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return Response.status(200).entity(jsonObject.toString()).build();
+	}
+	
+	
+	@POST
+	@Path("/updatePassword")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updatepassword(String value) {
+		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
+		jsonEnvoi = Utils.parseJsonObject(value);
+
+		int id = 0;
+		if (jsonEnvoi.containsKey("id")) {
+			id = Integer.valueOf((String) jsonEnvoi.get("id"));
+			if (id == 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "id est vide").toString())
+						.build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "id est vide").toString())
+					.build();
+
+		}
+
+		String password;
+		String passwordHash;
+		if (jsonEnvoi.containsKey("password") && jsonEnvoi.get("password") != null) {
+			password = (String) jsonEnvoi.get("password");
+			if (password == null || password.equals("")) {
+				return Response.status(200).entity(Utils.getJsonError("error", 401, "Le password est vide").toString())
+						.build();
+			} else {
+				passwordHash = Utils.get_SHA_512_SecurePassword(password);
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 401, "Le password est vide").toString())
+					.build();
+		}
+
+		AccountDao accountDao = new AccountDao();
+		Boolean insertion = accountDao.updatePasswordById(id, passwordHash);
+
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put("error_update", insertion);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return Response.status(200).entity(jsonObject.toString()).build();
+	}
+	
+	
+	
+
 }

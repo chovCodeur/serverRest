@@ -119,11 +119,20 @@ public class Bonus {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("id", this.id_objet);
-			if (Utils.testStringForJson(this.description_recette)) json.put("description", this.description_recette);
-			if (Utils.testStringForJson(this.type_objet)) json.put("type", this.type_objet);
-			json.put("qte", this.qte);
 			json.put("puissance", this.puissance_objet);
+			if (Utils.testStringForJson(this.nom_recette)) json.put("nom", this.nom_recette);
+			if (Utils.testStringForJson(this.description_recette)) json.put("description", this.description_recette);
+			json.put("qte", this.qte);
+			
+			if (this.nom_recette.contains("soin")) {
+				json.put("type", "health");
+				
+			} else if (this.nom_recette.contains("dégat")) {
+				json.put("type", "attack");
 
+			} else if (this.nom_recette.contains("défense")) {
+				json.put("type", "defense");
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
