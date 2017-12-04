@@ -17,7 +17,9 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.api.dao.AccountDao;
+import com.api.dao.BonusDao;
 import com.api.entitie.Account;
+import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
 import com.api.service.AccountService;
 import com.api.utils.Utils;
@@ -25,45 +27,83 @@ import com.api.utils.Utils;
 @Path("/howob")
 public class HowobService {
 
-	final static Logger logger = Logger.getLogger(HowobService.class.getName());
-	final static String URL_1 = "https://slack.com/api/api.test";
 
 	@GET
-	@Path("/testHTTP")
+	@Path("/potions/{uuid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttp() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_1);
+	public Response getPotionsByUuidGet(@PathParam("uuid") String uuid) {
+		if (uuid == null || uuid.equals("")) {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul")).build();
+		}
+		
+		BonusDao bonusDao = new BonusDao();
+		ArrayList<Bonus> listeBonus = new ArrayList<Bonus>();
+		
+		listeBonus = bonusDao.getBonusByUuidAccount(uuid, "H");
+		
+
+		JSONObject json = new JSONObject();
+		try {
+			for (Bonus bonus : listeBonus) {
+				json.put(String.valueOf(bonus.getId_objet()), bonus.getJson());
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
 		return Response.status(200).entity(json.toString()).build();
 	}
-
+	
 	@POST
-	@Path("/testHTTP")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response Post() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_1);
-		return Response.status(200).entity(json.toString()).build();
-	}
-
-	@GET
-	@Path("/testHTTPS")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttps() {
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp(URL_1);
-		return Response.status(200).entity(json.toString()).build();
-	}
-
-	@POST
-	@Path("/testHttpWithJSON")
+	@Path("/potions/{uuid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response testHttpWithJSON(String value) {
+	public Response getPotionsByUuidPost (@PathParam("uuid") String uuid, String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		jsonEnvoi = Utils.parseJsonObject(value);
-		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject jsonRetour = myHttpRequest.getJsonByPostWithJsonBody("http://howob.masi-henallux.be/api/auth/signin/", jsonEnvoi);
-		return Response.status(200).entity(jsonRetour.toString()).build();
+		
+		
+		if (uuid == null || uuid.equals("")) {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul").toString()).build();
+		}
+		
+		BonusDao bonusDao = new BonusDao();
+
+		int idPotion = 0;
+		int qtePotion = 0;
+		if (jsonEnvoi.containsKey("id") && jsonEnvoi.get("id") != null) {
+			Long id = (Long) jsonEnvoi.get("id");
+			idPotion = id.intValue();
+			if (idPotion == 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant de la potion est nul").toString()).build();
+			}
+		}
+
+		if (jsonEnvoi.containsKey("qte") && jsonEnvoi.get("qte") != null) {
+			Long qte = (Long) jsonEnvoi.get("qte");
+			qtePotion = qte.intValue();
+			if (qtePotion == 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité de la potion est nulle").toString()).build();
+			}
+		}
+		
+		int nbEnbase = bonusDao.getQtePotionByUuidAndidPotion(idPotion, uuid);
+
+		if (qtePotion > nbEnbase) {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité est supérieure à la quantité actuelle").toString()).build();
+		}
+		
+		Boolean retour = bonusDao.updateInventaireByUuid(nbEnbase-qtePotion, idPotion, uuid);
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("success", !retour);
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return Response.status(200).entity(json.toString()).build();
 	}
+	
 }

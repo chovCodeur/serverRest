@@ -124,10 +124,10 @@ public class Bonus {
 			if (Utils.testStringForJson(this.description_recette)) json.put("description", this.description_recette);
 			json.put("qte", this.qte);
 			
-			if (this.nom_recette.contains("soin")) {
+			if (this.nom_recette.contains("soins")) {
 				json.put("type", "health");
 				
-			} else if (this.nom_recette.contains("dégat")) {
+			} else if (this.nom_recette.contains("dégâts")) {
 				json.put("type", "attack");
 
 			} else if (this.nom_recette.contains("défense")) {
