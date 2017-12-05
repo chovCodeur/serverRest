@@ -141,9 +141,9 @@ public class Account {
 			if (Utils.testStringForJson(this.email))  json.put("email", this.email);
 			if (Utils.testStringForJson(this.username)) json.put("username", this.username);
 			if (Utils.testStringForJson(this.id_global)) json.put("globalId", this.id_global);
-			json.put("deleted_at", this.deleted_at);
-			json.put("created_at", this.created_at);
-			json.put("updated_at", this.updated_at);
+			json.put("deletedAt", this.deleted_at);
+			json.put("createdAt", this.created_at);
+			json.put("updatedAt", this.updated_at);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

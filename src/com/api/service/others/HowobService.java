@@ -33,7 +33,7 @@ public class HowobService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPotionsByUuidGet(@PathParam("uuid") String uuid) {
 		if (uuid == null || uuid.equals("")) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul")).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul").toString()).build();
 		}
 		
 		BonusDao bonusDao = new BonusDao();

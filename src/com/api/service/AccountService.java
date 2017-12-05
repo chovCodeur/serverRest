@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -202,7 +203,6 @@ public class AccountService {
 	public Response signinAutreJeu(String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		jsonEnvoi = Utils.parseJsonObject(value);
-		System.out.println(jsonEnvoi.toJSONString());
 		String username = new String();
 		if (jsonEnvoi.containsKey("username") && jsonEnvoi.get("username") != null) {
 			username = (String) jsonEnvoi.get("username");
@@ -229,16 +229,43 @@ public class AccountService {
 		}
 
 		JSONObject jsonRetourTemporaire = new JSONObject();
-		MyHttpRequest httpRequest = new MyHttpRequest();
 
-		jsonRetourTemporaire = httpRequest.getJsonByPostWithJsonBody("http://howob.masi-henallux.be/api/auth/signin",
-				jsonEnvoi);
+		
+		jsonRetourTemporaire = appelerSignInAutreJeu("http://howob.masi-henallux.be/api/auth/signin", jsonEnvoi);
+		if (jsonRetourTemporaire == null) {
+			jsonRetourTemporaire = appelerSignInAutreJeu("http://artshared.fr/andev1/distribue/api/auth/signin/", jsonEnvoi);
+			if (jsonRetourTemporaire == null) {
+				// TODO BOOMCRAFT
+			} else {
+				// TODO 	return Response.status(200).entity(jsonRetourTemporaire.toString()).build(); 
+
+			}
+		} else {
+			return Response.status(200).entity(jsonRetourTemporaire.toString()).build(); 
+		}
+		
+		if (jsonRetourTemporaire == null) {
+			try {
+				jsonRetourTemporaire = new JSONObject();
+				jsonRetourTemporaire.put("signin", false);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return Response.status(200).entity(jsonRetourTemporaire.toString()).build();
+	}
+	
+	private JSONObject appelerSignInAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi) {
+		JSONObject jsonRetourTemporaire = new JSONObject();
+		MyHttpRequest httpRequest = new MyHttpRequest();
+		jsonRetourTemporaire = httpRequest.getJsonByPostWithJsonBody(url, jsonEnvoi);
 
 		JSONObject jsonRetour = new JSONObject();
 
 		try {
 			if (jsonRetourTemporaire.isNull("user")) {
-				jsonRetour.put("signin", false);
+				return null;
 			} else {
 				jsonRetour.put("signin", true);
 				if (jsonRetourTemporaire.isNull("uuid_ailleurs")) {
@@ -251,9 +278,7 @@ public class AccountService {
 			e.printStackTrace();
 		}
 
-		System.out.println(jsonRetour.toString());
-
-		return Response.status(200).entity(jsonRetour.toString()).build();
+		return jsonRetour;
 	}
 
 	@POST
@@ -297,12 +322,16 @@ public class AccountService {
 				e.printStackTrace();
 			}
 		}
+		
+		if (appelerExistingAutreJeu("http://artshared.fr/andev1/distribue/api/auth/exist/", jsonEnvoi)) {
+			try {
+				jsonRetour.put("existing", "famvillage");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 
 		/*
-		 * if (appelerExistingAutreJeu(
-		 * "http://boomcraft.masi-henallux.be/api/auth/existing", jsonEnvoi)) { try {
-		 * jsonRetour.put("existing", "boomcraft"); } catch (JSONException e) {
-		 * e.printStackTrace(); } }
 		 * 
 		 * if (appelerExistingAutreJeu(
 		 * "http://farmvillage.masi-henallux.be/api/auth/existing", jsonEnvoi)) { try {
@@ -325,13 +354,14 @@ public class AccountService {
 		MyHttpRequest httpRequest = new MyHttpRequest();
 
 		jsonRetourIntermediaire = httpRequest.getJsonByPostWithJsonBody(url, jsonEnvoi);
-
+		
 		if (!jsonRetourIntermediaire.isNull("email")) {
 			try {
 				Boolean mailExist = (Boolean) jsonRetourIntermediaire.get("email");
 				if (mailExist) {
 					return true;
 				}
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -343,6 +373,7 @@ public class AccountService {
 				if (usernameExist) {
 					return true;
 				}
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -350,6 +381,8 @@ public class AccountService {
 
 		return false;
 	}
+	
+	
 
 	@POST
 	@Path("/insert")
@@ -433,8 +466,5 @@ public class AccountService {
 		}
 		return Response.status(200).entity(jsonObject.toString()).build();
 	}
-	
-	
-	
 
 }

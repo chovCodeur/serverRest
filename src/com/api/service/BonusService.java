@@ -37,7 +37,6 @@ public class BonusService {
 		JSONObject json = new JSONObject();
 		try {
 			
-			
 			json.put("boomcraft", randomBool());
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -48,16 +47,25 @@ public class BonusService {
 	@GET
 	@Path("/farmvillage/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response bonusFarmvillage() {
+	public Response bonusFarmvillage(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		JSONObject json = new JSONObject();
+		JSONObject json = myHttpRequest.getJsonByHttp("http://artshared.fr/andev1/distribue/api/veggie/bonus/?uid="+uuid);
+		JSONObject jsonRetour = new JSONObject();
+		int qte = 0;
 		try {
-			json.put("farmvillage", randomBool());
+			if(!json.isNull("bonus") && !json.getJSONObject("bonus").isNull("quantite")) {
+				qte = Integer.valueOf((String) json.getJSONObject("bonus").get("quantite"));
+			}
+			if (qte > 0) {
+				jsonRetour.put("farmvillage", true);
+			} else {
+				jsonRetour.put("farmvillage", false);
+
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return Response.status(200).entity(json.toString()).build();
+		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 
 	@GET
@@ -66,7 +74,6 @@ public class BonusService {
 	public Response bonusHowob(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		
-		System.out.println("Ahttp://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid);
 		JSONObject json = myHttpRequest.getJsonByHttp("http://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid);
 		JSONObject jsonRetour = new JSONObject();
 		int qte = 0;
@@ -74,7 +81,7 @@ public class BonusService {
 			if(!json.isNull("qte")) {
 				qte = json.getInt("qte");
 			}
-			System.out.println(qte);
+
 			if (qte > 0) {
 				jsonRetour.put("howob", true);
 			} else {
@@ -90,7 +97,7 @@ public class BonusService {
 	@POST
 	@Path("/notifier")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response notifierBonus (String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
@@ -101,7 +108,8 @@ public class BonusService {
 		if (jsonEnvoi.containsKey("uuid") && jsonEnvoi.get("uuid") != null) {
 			uuid = (String) jsonEnvoi.get("uuid");
 		} else {
-			return Response.status(500).entity("KO").build();
+			
+			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'uuid ne peut pas être vide")).build();
 		}
 		
 		org.json.simple.JSONObject jsonRetour = new org.json.simple.JSONObject();
@@ -118,27 +126,24 @@ public class BonusService {
 		tmp = false;
 		if (jsonEnvoi.containsKey("farmvillage") && jsonEnvoi.get("farmvillage") != null) {
 			tmp = (Boolean) jsonEnvoi.get("farmvillage");
-
 			if (tmp) {
-				
-				// On appelle le FARMVILLAGE URL
+				jsonRetour.put("qte", 1);
+				myHttpRequest.getJsonByPostWithJsonBody("http://artshared.fr/andev1/distribue/api/veggie/bonus/?uid="+uuid, jsonRetour);
 			}
 		}
 		
 		jsonRetour = new org.json.simple.JSONObject();
 		tmp = false;
-		if (jsonEnvoi.containsKey("howob") && jsonEnvoi.get("howob") != null) {
-			tmp = (Boolean) jsonEnvoi.get("howob");
+		if (jsonEnvoi.containsKey("boomcraft") && jsonEnvoi.get("boomcraft") != null) {
+			tmp = (Boolean) jsonEnvoi.get("boomcraft");
 			if (tmp) {
-				// On appelle le FARMVILLAGE URL
+				// On appelle le boomcraft URL
 			}
 		}
-
-		
-		return Response.status(200).entity("ok").build();
+		jsonRetour = new org.json.simple.JSONObject();
+		jsonRetour.put("succes", true);
+		return Response.status(200).entity(jsonRetour.toJSONString()).build();
 	}
-	
-	
 	
 	public Boolean randomBool() {
 		

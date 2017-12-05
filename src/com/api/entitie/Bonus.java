@@ -126,13 +126,20 @@ public class Bonus {
 			
 			if (this.nom_recette.contains("soins")) {
 				json.put("type", "health");
-				
 			} else if (this.nom_recette.contains("dégâts")) {
 				json.put("type", "attack");
-
 			} else if (this.nom_recette.contains("défense")) {
 				json.put("type", "defense");
+			} else if (this.nom_recette.contains("pierre")) {
+				json.put("type", "pierre");
+			} else if (this.nom_recette.contains("d'or")) {
+				json.put("type", "or");
+			} else if (this.nom_recette.contains("nourriture")) {
+				json.put("type", "nourriture");
+			} else if (this.nom_recette.contains("bois")) {
+				json.put("type", "bois");
 			}
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

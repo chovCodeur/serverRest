@@ -272,6 +272,7 @@ public class AccountDao {
 			Calendar calendar = Calendar.getInstance();
 			Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
+			System.out.println("FACTION = " + account.getFaction());
 			// create the mysql insert preparedstatement
 			stmt = con.prepareStatement(QUERY_INSERT);
 			stmt.setString(1, account.getGlobalID());

@@ -17,7 +17,7 @@ import com.api.entitie.Inventaire;
 public class BonusDao {
 	final static Logger logger = Logger.getLogger(BonusDao.class.getName()); //UNIXTIME(colonne_timestamp) as valeur_datetime
 
-	private final static String QUERY_SELECT_POTION_BY_UID ="SELECT OBJET.id_objet, qte, nom_recette, description, puissance_objet, type_objet FROM INVENTAIRE INNER JOIN OBJET ON INVENTAIRE.id_objet = OBJET.id_objet INNER JOIN RECETTE ON RECETTE.id_objet = OBJET.id_objet WHERE INVENTAIRE.id_global = ? AND RECETTE.type = ? AND type_objet in ('potion')";
+	private final static String QUERY_SELECT_POTION_BY_UID ="SELECT OBJET.id_objet, qte, nom_recette, description, puissance_objet, type_objet FROM INVENTAIRE INNER JOIN OBJET ON INVENTAIRE.id_objet = OBJET.id_objet INNER JOIN RECETTE ON RECETTE.id_objet = OBJET.id_objet WHERE INVENTAIRE.id_global = ? AND RECETTE.type = ? AND qte > 0";
 	private final static String QUERY_UPDATE_INVENTAIRE ="UPDATE INVENTAIRE SET qte = ? WHERE id_objet = ? and id_global = ? ";
 	private final static String QUERY_GET_QTE_BY_UUDI_AND_ID_POTION ="SELECT qte FROM INVENTAIRE WHERE id_objet = ? and id_global = ? ";
 
