@@ -126,6 +126,8 @@ public class Bonus {
 			
 			if (this.nom_recette.contains("soins")) {
 				json.put("type", "health");
+			} else if (this.nom_recette.contains("magique")) {
+				json.put("type", "magic");
 			} else if (this.nom_recette.contains("dégâts")) {
 				json.put("type", "attack");
 			} else if (this.nom_recette.contains("défense")) {

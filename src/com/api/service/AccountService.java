@@ -22,6 +22,7 @@ import com.api.dao.AccountDao;
 import com.api.entitie.Account;
 import com.api.http.MyHttpRequest;
 import com.api.utils.Utils;
+import com.sun.jersey.json.impl.provider.entity.JSONListElementProvider;
 
 @Path("/account")
 public class AccountService {
@@ -30,6 +31,7 @@ public class AccountService {
 	// ResourceBundle.getBundle("message");
 
 	final static Logger logger = Logger.getLogger(AccountService.class.getName());
+	final static String TEMP_TIM = "10.113.51.25:8080";
 
 	@GET
 	@Path("/getAll")
@@ -47,6 +49,9 @@ public class AccountService {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		if (json.length() == 0) {
+			json = Utils.getJsonError("error", 401, "Aucun compte trouvé");
+		}
 		return Response.status(200).entity(json.toString()).build();
 	}
 
@@ -60,11 +65,7 @@ public class AccountService {
 		if (account != null) {
 			json = account.getJson();
 		} else {
-			try {
-				json.put("a", "a");// "error", messageProperties.getString("api.error.compte.aucun"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			json = Utils.getJsonError("Error", 401, "Aucun compte trouve");
 		}
 		return Response.status(200).entity(json.toString()).build();
 	}
@@ -79,11 +80,7 @@ public class AccountService {
 		if (account != null) {
 			json = account.getJson();
 		} else {
-			try {
-				json.put("error", "a");// messageProperties.getString("api.error.compte.aucun"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			json = Utils.getJsonError("Error", 401, "Aucun compte trouve");
 		}
 		return Response.status(200).entity(json.toString()).build();
 	}
@@ -98,11 +95,7 @@ public class AccountService {
 		if (account != null) {
 			json = account.getJson();
 		} else {
-			try {
-				json.put("error", "a");// messageProperties.getString("api.error.compte.aucun"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			json = Utils.getJsonError("Error", 401, "Aucun compte trouve");
 		}
 		return Response.status(200).entity(json.toString()).build();
 	}
@@ -228,56 +221,63 @@ public class AccountService {
 					.build();
 		}
 
-		JSONObject jsonRetourTemporaire = new JSONObject();
+		JSONObject jsonRetour = new JSONObject();
 
 		
-		jsonRetourTemporaire = appelerSignInAutreJeu("http://howob.masi-henallux.be/api/auth/signin", jsonEnvoi);
-		if (jsonRetourTemporaire == null) {
-			jsonRetourTemporaire = appelerSignInAutreJeu("http://artshared.fr/andev1/distribue/api/auth/signin/", jsonEnvoi);
-			if (jsonRetourTemporaire == null) {
-				// TODO BOOMCRAFT
-			} else {
-				// TODO 	return Response.status(200).entity(jsonRetourTemporaire.toString()).build(); 
-
+		jsonRetour = appelerSignInAutreJeu("http://howob.masi-henallux.be/api/auth/signin", jsonEnvoi, false);
+		if (jsonRetour == null) {
+			jsonRetour = appelerSignInAutreJeu("http://artshared.fr/andev1/distribue/api/auth/signin/", jsonEnvoi, false);
+			if (jsonRetour == null) {
+				jsonRetour = appelerSignInAutreJeu("http://boomcraft.masi-henallux.be:8080/api.asmx/signin", jsonEnvoi, true);
 			}
-		} else {
-			return Response.status(200).entity(jsonRetourTemporaire.toString()).build(); 
 		}
 		
-		if (jsonRetourTemporaire == null) {
+		if (jsonRetour == null) {
 			try {
-				jsonRetourTemporaire = new JSONObject();
-				jsonRetourTemporaire.put("signin", false);
+				jsonRetour = new JSONObject();
+				jsonRetour.put("signin", false);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 
-		return Response.status(200).entity(jsonRetourTemporaire.toString()).build();
+		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 	
-	private JSONObject appelerSignInAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi) {
+	private JSONObject appelerSignInAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi, Boolean withD) {
 		JSONObject jsonRetourTemporaire = new JSONObject();
 		MyHttpRequest httpRequest = new MyHttpRequest();
 		jsonRetourTemporaire = httpRequest.getJsonByPostWithJsonBody(url, jsonEnvoi);
 
 		JSONObject jsonRetour = new JSONObject();
 
-		try {
-			if (jsonRetourTemporaire.isNull("user")) {
-				return null;
-			} else {
-				jsonRetour.put("signin", true);
-				if (jsonRetourTemporaire.isNull("uuid_ailleurs")) {
-					jsonRetour.put("uuid_ailleurs", jsonRetourTemporaire.getJSONObject("user").get("globalId"));
+		if (withD) {
+			try {
+				if (jsonRetourTemporaire.isNull("d") || jsonRetourTemporaire.getJSONObject("d").isNull("user")) {
+					return null;
+				} else {
+					jsonRetour.put("signin", true);
+					if (!jsonRetourTemporaire.getJSONObject("d").getJSONObject("user").isNull("globalId")) {
+						jsonRetour.put("uuid_ailleurs", jsonRetourTemporaire.getJSONObject("d").getJSONObject("user").getString("globalId"));
+					}
 				}
-
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}	
+		} else {
+			try {
+				if (jsonRetourTemporaire.isNull("user")) {
+					return null;
+				} else {
+					jsonRetour.put("signin", true);
+					if (!jsonRetourTemporaire.getJSONObject("user").isNull("globalId")) {
+						jsonRetour.put("uuid_ailleurs", jsonRetourTemporaire.getJSONObject("user").get("globalId"));
+					}
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-
 		return jsonRetour;
 	}
 
@@ -315,7 +315,7 @@ public class AccountService {
 		}
 
 		JSONObject jsonRetour = new JSONObject();
-		if (appelerExistingAutreJeu("http://howob.masi-henallux.be/api/auth/existing", jsonEnvoi)) {
+		if (appelerExistingAutreJeu("http://howob.masi-henallux.be/api/auth/existing", jsonEnvoi, false)) {
 			try {
 				jsonRetour.put("existing", "howob");
 			} catch (JSONException e) {
@@ -323,7 +323,7 @@ public class AccountService {
 			}
 		}
 		
-		if (appelerExistingAutreJeu("http://artshared.fr/andev1/distribue/api/auth/exist/", jsonEnvoi)) {
+		if (appelerExistingAutreJeu("http://artshared.fr/andev1/distribue/api/auth/exist/", jsonEnvoi, false)) {
 			try {
 				jsonRetour.put("existing", "famvillage");
 			} catch (JSONException e) {
@@ -331,13 +331,13 @@ public class AccountService {
 			}
 		}
 
-		/*
-		 * 
-		 * if (appelerExistingAutreJeu(
-		 * "http://farmvillage.masi-henallux.be/api/auth/existing", jsonEnvoi)) { try {
-		 * jsonRetour.put("existing", "farmvillage"); } catch (JSONException e) {
-		 * e.printStackTrace(); } }
-		 */
+		if (appelerExistingAutreJeu("http://boomcraft.masi-henallux.be:8080/api.asmx/existing", jsonEnvoi, true)) {
+			try {
+				jsonRetour.put("existing", "boomcraft");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 
 		if (jsonRetour.length() == 0) {
 			try {
@@ -349,34 +349,64 @@ public class AccountService {
 		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 
-	private Boolean appelerExistingAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi) {
+	private Boolean appelerExistingAutreJeu(String url, org.json.simple.JSONObject jsonEnvoi, Boolean withD) {
 		JSONObject jsonRetourIntermediaire = new JSONObject();
 		MyHttpRequest httpRequest = new MyHttpRequest();
 
 		jsonRetourIntermediaire = httpRequest.getJsonByPostWithJsonBody(url, jsonEnvoi);
-		
-		if (!jsonRetourIntermediaire.isNull("email")) {
-			try {
-				Boolean mailExist = (Boolean) jsonRetourIntermediaire.get("email");
-				if (mailExist) {
-					return true;
+		if (withD) {
+			if (!jsonRetourIntermediaire.isNull("d")) {
+				try {
+					if (!jsonRetourIntermediaire.getJSONObject("d").isNull("email")) {
+						Boolean mailExist = (Boolean) jsonRetourIntermediaire.getJSONObject("d").get("email");
+						if (mailExist) {
+							return true;
+						}
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-
-			} catch (JSONException e) {
-				e.printStackTrace();
 			}
-		}
-
-		if (!jsonRetourIntermediaire.isNull("username")) {
-			try {
-				Boolean usernameExist = (Boolean) jsonRetourIntermediaire.get("username");
-				if (usernameExist) {
-					return true;
+	
+			if (!jsonRetourIntermediaire.isNull("d")) {
+				try {
+					if (!jsonRetourIntermediaire.getJSONObject("d").isNull("username")) {
+						Boolean usernameExist = (Boolean) jsonRetourIntermediaire.getJSONObject("d").get("username");
+						if (usernameExist) {
+							return true;
+						}
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-
-			} catch (JSONException e) {
-				e.printStackTrace();
 			}
+			
+		} else {
+			
+			if (!jsonRetourIntermediaire.isNull("email")) {
+				try {
+					Boolean mailExist = (Boolean) jsonRetourIntermediaire.get("email");
+					if (mailExist) {
+						return true;
+					}
+	
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+	
+			if (!jsonRetourIntermediaire.isNull("username")) {
+				try {
+					Boolean usernameExist = (Boolean) jsonRetourIntermediaire.get("username");
+					if (usernameExist) {
+						return true;
+					}
+	
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			
 		}
 
 		return false;
