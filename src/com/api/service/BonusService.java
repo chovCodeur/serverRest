@@ -2,6 +2,7 @@ package com.api.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -27,21 +28,37 @@ import com.api.utils.Utils;
 public class BonusService {
 
 	final static Logger logger = Logger.getLogger(BonusService.class.getName());
-	
+    private static ResourceBundle applicationProperties = ResourceBundle.getBundle("application");
+
 	@GET
 	@Path("/boomcraft/{uid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response bonusBoomcraft() {
+	public Response bonusBoomcraft(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		//JSONObject json = myHttpRequest.getJsonByHttp(URL_BONUS);
-		JSONObject json = new JSONObject();
+		JSONObject json = myHttpRequest.getJsonByHttp(applicationProperties.getString("bonus.boomcraft")+"\""+uuid+"\"");
+
+		JSONObject jsonRetour = new JSONObject();
+		int qte = 0;
 		try {
-			
-			json.put("boomcraft", randomBool());
+			if(!json.isNull("bonus") && !json.getJSONObject("bonus").isNull("quantite")) {
+				qte = Integer.valueOf((String) json.getJSONObject("bonus").get("quantite"));
+			}
+			if (qte > 0) {
+				jsonRetour.put("boomcraft", true);
+			} else {
+				jsonRetour.put("boomcraft", false);
+
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return Response.status(200).entity(json.toString()).build();
+
+		try {
+			jsonRetour.put("boomcraft", false);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 
 	@GET
@@ -49,7 +66,7 @@ public class BonusService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response bonusFarmvillage(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		JSONObject json = myHttpRequest.getJsonByHttp("http://artshared.fr/andev1/distribue/api/veggie/bonus/?uid="+uuid);
+		JSONObject json = myHttpRequest.getJsonByHttp(applicationProperties.getString("bonus.farmvillage")+uuid);
 		JSONObject jsonRetour = new JSONObject();
 		int qte = 0;
 		try {
@@ -73,8 +90,8 @@ public class BonusService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response bonusHowob(@PathParam("uid") String uuid) {
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
-		
-		JSONObject json = myHttpRequest.getJsonByHttp("http://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid);
+		JSONObject json = myHttpRequest.getJsonByHttpWithToken(applicationProperties.getString("bonus.howob")+uuid, applicationProperties.getString("bonus.wobob.veggie.token"));
+
 		JSONObject jsonRetour = new JSONObject();
 		int qte = 0;
 		try {
@@ -118,7 +135,7 @@ public class BonusService {
 			tmp = (Boolean) jsonEnvoi.get("howob");
 			if (tmp) {
 				jsonRetour.put("qte", 1);
-				myHttpRequest.getJsonByPostWithJsonBody("http://howob.masi-henallux.be/api/veggiecrush/amelioration/"+uuid, jsonRetour);
+				myHttpRequest.getJsonByPostWithJsonBodyHttpsAndToken(applicationProperties.getString("notifier.bonus.howob")+uuid, jsonRetour, applicationProperties.getString("bonus.wobob.veggie.token"));
 			}
 		}
 		
@@ -128,7 +145,7 @@ public class BonusService {
 			tmp = (Boolean) jsonEnvoi.get("farmvillage");
 			if (tmp) {
 				jsonRetour.put("qte", 1);
-				myHttpRequest.getJsonByPostWithJsonBody("http://artshared.fr/andev1/distribue/api/veggie/bonus/?uid="+uuid, jsonRetour);
+				myHttpRequest.getJsonByPostWithJsonBody(applicationProperties.getString("notifier.bonus.farmvillage")+uuid, jsonRetour);
 			}
 		}
 		
@@ -137,16 +154,13 @@ public class BonusService {
 		if (jsonEnvoi.containsKey("boomcraft") && jsonEnvoi.get("boomcraft") != null) {
 			tmp = (Boolean) jsonEnvoi.get("boomcraft");
 			if (tmp) {
-				// On appelle le boomcraft URL
+				jsonRetour.put("qte", 1);
+				jsonRetour.put("UUID", uuid);
+				myHttpRequest.getJsonByPostWithJsonBody(applicationProperties.getString("notifier.bonus.boomcraft"), jsonRetour);
 			}
 		}
 		jsonRetour = new org.json.simple.JSONObject();
 		jsonRetour.put("succes", true);
 		return Response.status(200).entity(jsonRetour.toJSONString()).build();
-	}
-	
-	public Boolean randomBool() {
-		
-		return (Math.random() >= 0.5);
 	}
 }

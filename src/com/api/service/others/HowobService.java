@@ -2,6 +2,8 @@ package com.api.service.others;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -9,6 +11,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -27,13 +31,27 @@ import com.api.utils.Utils;
 @Path("/howob")
 public class HowobService {
 
+    private static ResourceBundle applicationProperties = ResourceBundle.getBundle("application");
 
+	
 	@GET
 	@Path("/potions/{uuid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPotionsByUuidGet(@PathParam("uuid") String uuid) {
+	public Response getPotionsByUuidGet(@Context HttpHeaders header, @PathParam("uuid") String uuid) {
+
+		List<String> authHeaders =  header.getRequestHeader("Authorization");
+
+		if(authHeaders != null && authHeaders.get(0) != null) {
+			if (!authHeaders.get(0).equals(applicationProperties.getString("bonus.howob.token"))) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.mauvais.token")).toString()).build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.no.token")).toString()).build();
+
+		}
+		
 		if (uuid == null || uuid.equals("")) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul").toString()).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.nul")).toString()).build();
 		}
 		
 		BonusDao bonusDao = new BonusDao();
@@ -45,7 +63,7 @@ public class HowobService {
 		JSONObject json = new JSONObject();
 		try {
 			for (Bonus bonus : listeBonus) {
-				json.put(String.valueOf(bonus.getId_objet()), bonus.getJson());
+				json.put(String.valueOf(bonus.getId_objet()), bonus.getJsonForApi());
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -58,13 +76,23 @@ public class HowobService {
 	@Path("/potions/{uuid}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPotionsByUuidPost (@PathParam("uuid") String uuid, String value) {
+	public Response getPotionsByUuidPost (@Context HttpHeaders header, @PathParam("uuid") String uuid, String value) {
 		org.json.simple.JSONObject jsonEnvoi = new org.json.simple.JSONObject();
 		jsonEnvoi = Utils.parseJsonObject(value);
 		
+		List<String> authHeaders =  header.getRequestHeader("Authorization");
+
+		if(authHeaders != null && authHeaders.get(0) != null) {
+			if (!authHeaders.get(0).equals(applicationProperties.getString("bonus.howob.token"))) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.mauvais.token")).toString()).build();
+			}
+		} else {
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.no.token")).toString()).build();
+		}
+		
 		
 		if (uuid == null || uuid.equals("")) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul").toString()).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.nul")).toString()).build();
 		}
 		
 		BonusDao bonusDao = new BonusDao();
@@ -74,8 +102,8 @@ public class HowobService {
 		if (jsonEnvoi.containsKey("id") && jsonEnvoi.get("id") != null) {
 			Long id = (Long) jsonEnvoi.get("id");
 			idPotion = id.intValue();
-			if (idPotion == 0) {
-				return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant de la potion est nul").toString()).build();
+			if (idPotion <= 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.nul")).toString()).build();
 			}
 		}
 
@@ -83,14 +111,14 @@ public class HowobService {
 			Long qte = (Long) jsonEnvoi.get("qte");
 			qtePotion = qte.intValue();
 			if (qtePotion == 0) {
-				return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité de la potion est nulle").toString()).build();
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.invalide")).toString()).build();
 			}
 		}
 		
 		int nbEnbase = bonusDao.getQtePotionByUuidAndidPotion(idPotion, uuid);
 
 		if (qtePotion > nbEnbase) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité est supérieure à la quantité actuelle").toString()).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.superieure")).toString()).build();
 		}
 		
 		Boolean retour = bonusDao.updateInventaireByUuid(nbEnbase-qtePotion, idPotion, uuid);

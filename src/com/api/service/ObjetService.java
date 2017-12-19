@@ -21,6 +21,7 @@ public class ObjetService {
 	
 	final static Logger logger = Logger.getLogger(InventaireService.class.getName());
 
+	/*
 	@GET
 	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -33,7 +34,7 @@ public class ObjetService {
 		JSONObject json = new JSONObject();
 		try {
 			for (Objet objet : objets) {
-				json.put(String.valueOf(objet.getId_objet()), objet.getJson());
+				json.put(String.valueOf(objet.getId_objet()), objet.getJsonForApi());
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -54,11 +55,12 @@ public class ObjetService {
 		JSONObject json = new JSONObject();
 		try {
 			for (Objet objet : objets) {
-					json.put(String.valueOf(objet.getId_objet()), objet.getJson());
+					json.put(String.valueOf(objet.getId_objet()), objet.getJsonForApi());
 				}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return Response.status(200).entity(json.toString()).build();
 	}
+	*/
 }

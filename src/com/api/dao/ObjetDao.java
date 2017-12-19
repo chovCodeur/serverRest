@@ -30,7 +30,7 @@ public class ObjetDao {
 
 
 	final static Logger logger = Logger.getLogger(ObjetDao.class.getName());
-
+/*
 	public ArrayList<Objet> getAllObjets() {
 		Connection connexion = null;
 		Statement stmt = null;
@@ -66,6 +66,8 @@ public class ObjetDao {
 		return objets;
 	}
 
+*/
+	/*
 	public Objet getObjetById(int id) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -101,6 +103,8 @@ public class ObjetDao {
 		return objet;
 	}
 
+*/
+	/*
 	public ArrayList<Objet> getObjetByIdAccount(String idAccount) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -140,12 +144,13 @@ public class ObjetDao {
 		return objets;
 	}
 
+
 	private Objet mappingObjet(final ResultSet rset) throws SQLException {
 		final int id_objet = rset.getInt("id_objet");
 		final String nom_objet = rset.getString("nom_objet");
 		final String nom_type_objet = rset.getString("type_objet");
-		final TypeObjet type_objet = TypeObjet.valueOf(nom_type_objet);// TypeObjet.POTION;
-		final int puissance_objet = rset.getInt("puissance_objet");;// .POTION;
+		final TypeObjet type_objet = TypeObjet.valueOf(nom_type_objet);
+		final int puissance_objet = rset.getInt("puissance_objet");
 
 		final Objet objet = new Objet(id_objet, nom_objet, type_objet, puissance_objet);
 		return objet;
@@ -226,7 +231,9 @@ public class ObjetDao {
 		}
 		return nombre;
 	}
+	*/
 	
+	/*
 	public int testPresentInInventaireByAccounByObjet(String idAccount, int idObjet) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -299,4 +306,6 @@ public class ObjetDao {
 		}
 		return errorInsert;
 	}
+	
+	*/
 }

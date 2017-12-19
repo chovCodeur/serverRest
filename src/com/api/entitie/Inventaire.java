@@ -44,7 +44,7 @@ public class Inventaire {
 		this.qte = quantite;
 	}
 	
-	public JSONObject getJson() {
+	public JSONObject getJsonForApi() {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("id_user", this.id_user);

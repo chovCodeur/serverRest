@@ -15,7 +15,7 @@ import org.codehaus.jettison.json.JSONObject;
 @Path("/users")
 public class UtilisateurService {
 	final static Logger logger = Logger.getLogger(UtilisateurService.class.getName());
-
+/*
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -29,4 +29,6 @@ public class UtilisateurService {
 
 		return Response.status(200).entity(result).build();
 	}
+	
+	*/
 }

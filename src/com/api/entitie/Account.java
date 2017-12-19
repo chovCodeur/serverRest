@@ -106,31 +106,11 @@ public class Account {
 		this.deleted_at = deletedAT;
 	}
 	
-	
-	
 	@Override
 	public String toString() {
 		return "Account [id=" + id + ", globalID=" + id_global + ", username=" + username + ", email=" + email
 				+ ", password=" + password + ", faction=" + faction + ", createdAT=" + created_at + ", updatedAT="
 				+ updated_at + ", deletedAT=" + deleted_at + "]";
-	}
-
-	public JSONObject getJson() {
-		JSONObject json = new JSONObject();
-		try {
-			json.put("id", this.id);
-			if (Utils.testStringForJson(this.id_global)) json.put("id_global", this.id_global);
-			if (Utils.testStringForJson(this.username)) json.put("username", this.username);
-			if (Utils.testStringForJson(this.email))  json.put("email", this.email);
-			if (Utils.testStringForJson(this.password)) json.put("password", this.password);
-			if (Utils.testStringForJson(this.faction)) json.put("faction", this.faction);
-			json.put("created_at", this.created_at);
-			json.put("updated_at", this.updated_at);
-			json.put("deleted_at", this.deleted_at);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return json;
 	}
 	
 	public JSONObject getJsonForApi() {

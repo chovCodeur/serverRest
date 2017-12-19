@@ -25,7 +25,7 @@ public class InventaireDao {
 	private final static String QUERY_UPDATE = "UPDATE INVENTAIRE SET qte = ? WHERE id_user = ? AND id_objet = ?";
 	
 	final static Logger logger = Logger.getLogger(InventaireDao.class.getName());
-
+/*
 	public ArrayList<Inventaire> getAllInventaires() {
 		Connection connexion = null;
 		Statement stmt = null;
@@ -98,13 +98,9 @@ public class InventaireDao {
 		return inventaires;
 	}
 	
-	private Inventaire mappingInventaire(final ResultSet rset) throws SQLException {
-		final int id_objet = rset.getInt("id_objet");
-		final String id_user = rset.getString("id_global");
-		final int qte = rset.getInt("qte");
-		final Inventaire inventaire = new Inventaire(id_user, id_objet, qte);
-		return inventaire;
-	}
+	*/
+	
+	/*
 
 	public Boolean insertNewInventaire(Inventaire inventaire) {
 		Connection con = null;
@@ -126,7 +122,6 @@ public class InventaireDao {
 					stmt.setInt(1, nbObjetDejaPresent+inventaire.getQuantite());
 					stmt.setString(2, inventaire.getId_user());
 					stmt.setInt(3, inventaire.getId_objet());
-					// TODO Verifier requete 
 			} else {
 				stmt = con.prepareStatement(QUERY_INSERT);
 				stmt.setInt(1, inventaire.getId_objet());
@@ -158,6 +153,8 @@ public class InventaireDao {
 		return errorInsert;
 	}
 	
+	*/
+	/*
 	public ArrayList<Inventaire> getInventaireByIdAccountAndByIdObjet(int idAccount, int idObjet) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -196,6 +193,14 @@ public class InventaireDao {
 			}
 		}
 		return inventaires;
+	}
+	*/
+	private Inventaire mappingInventaire(final ResultSet rset) throws SQLException {
+		final int id_objet = rset.getInt("id_objet");
+		final String id_user = rset.getString("id_global");
+		final int qte = rset.getInt("qte");
+		final Inventaire inventaire = new Inventaire(id_user, id_objet, qte);
+		return inventaire;
 	}
 	
 	

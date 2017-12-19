@@ -24,7 +24,7 @@ import com.api.utils.Utils;
 public class InventaireService {
 
 	final static Logger logger = Logger.getLogger(InventaireService.class.getName());
-
+/*
 	@GET
 	@Path("/getAll")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -38,7 +38,7 @@ public class InventaireService {
 		try {
 			int i = 1;
 			for (Inventaire inventaire : inventaires) {
-				json.put(String.valueOf(i), inventaire.getJson());
+				json.put(String.valueOf(i), inventaire.getJsonForApi());
 				i++;
 			}
 		} catch (JSONException e) {
@@ -75,4 +75,5 @@ public class InventaireService {
 		}
 		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
+	*/
 }

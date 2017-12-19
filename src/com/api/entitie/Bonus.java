@@ -115,7 +115,7 @@ public class Bonus {
 		this.type_objet = type_objet;
 	}
 	
-	public JSONObject getJson() {
+	public JSONObject getJsonForApi() {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("id", this.id_objet);

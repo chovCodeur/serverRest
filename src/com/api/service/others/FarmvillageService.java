@@ -2,6 +2,7 @@ package com.api.service.others;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -28,12 +29,14 @@ import com.api.utils.Utils;
 @Path("/farmvillage")
 public class FarmvillageService {
 
+    private static ResourceBundle applicationProperties = ResourceBundle.getBundle("application");
+
 	@GET
 	@Path("/potions/{uuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPotionsByUuidGet(@PathParam("uuid") String uuid) {
 		if (uuid == null || uuid.equals("")) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul")).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.nul")).toString()).build();
 		}
 		
 		BonusDao bonusDao = new BonusDao();
@@ -44,7 +47,7 @@ public class FarmvillageService {
 		JSONArray jsonArray = new JSONArray();
 		
 		for (Bonus bonus : listeBonus) {
-			jsonArray.put(bonus.getJson());
+			jsonArray.put(bonus.getJsonForApi());
 		}
 		
 		return Response.status(200).entity(jsonArray.toString()).build();
@@ -59,7 +62,7 @@ public class FarmvillageService {
 		jsonEnvoi = Utils.parseJsonObject(value);
 		
 		if (uuid == null || uuid.equals("")) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant est nul").toString()).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.nul")).toString()).build();
 		}
 		
 		BonusDao bonusDao = new BonusDao();
@@ -69,23 +72,23 @@ public class FarmvillageService {
 		if (jsonEnvoi.containsKey("id") && jsonEnvoi.get("id") != null) {
 			Long id = (Long) jsonEnvoi.get("id");
 			idPotion = id.intValue();
-			if (idPotion == 0) {
-				return Response.status(200).entity(Utils.getJsonError("error", 500, "L'identifiant de la potion est nul").toString()).build();
+			if (idPotion <= 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.nul")).toString()).build();
 			}
 		}
 
 		if (jsonEnvoi.containsKey("qte") && jsonEnvoi.get("qte") != null) {
 			Long qte = (Long) jsonEnvoi.get("qte");
 			qtePotion = qte.intValue();
-			if (qtePotion == 0) {
-				return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité de la potion est nulle").toString()).build();
+			if (qtePotion  <= 0) {
+				return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.invalide")).toString()).build();
 			}
 		}
 		
 		int nbEnbase = bonusDao.getQtePotionByUuidAndidPotion(idPotion, uuid);
 
 		if (qtePotion > nbEnbase) {
-			return Response.status(200).entity(Utils.getJsonError("error", 500, "La quantité est supérieure à la quantité actuelle").toString()).build();
+			return Response.status(200).entity(Utils.getJsonError("error", 500, applicationProperties.getString("message.erreur.identifiant.potion.superieure")).toString()).build();
 		}
 		
 		Boolean retour = bonusDao.updateInventaireByUuid(nbEnbase-qtePotion, idPotion, uuid);

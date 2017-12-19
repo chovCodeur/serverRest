@@ -38,6 +38,7 @@ public class AccountDao {
 	private final static String QUERY_FIND_BY_USERNAME = "SELECT * FROM ACCOUNT WHERE USERNAME = ?";
 	private final static String QUERY_FIND_BY_UID = "SELECT * FROM ACCOUNT WHERE id_global = ?";
 
+	/*
 	public ArrayList<Account> getAllAccounts() {
 		Connection connexion = null;
 		Statement stmt = null;
@@ -112,6 +113,7 @@ public class AccountDao {
 		}
 		return account;
 	}
+	*/
 	
 	public Account getAccountByMail(String mail) {
 		Connection con = null;
@@ -152,8 +154,6 @@ public class AccountDao {
 		}
 		return account;
 	}
-	
-	
 	
 	public Boolean updatePasswordById(int id, String password) {
 		Connection con = null;
@@ -245,18 +245,6 @@ public class AccountDao {
 		Timestamp createdAT = rset.getTimestamp("created_at");
 		Timestamp updatedAT = rset.getTimestamp("updated_at");
 		Timestamp deletedAT = rset.getTimestamp("deleted_at");
-
-		/**if (Utils.testDateNulleForTimstamp(createdAT)) {
-			createdAT = null;
-		}
-		
-		if (Utils.testDateNulleForTimstamp(updatedAT)) {
-			updatedAT = null;
-		}
-		
-		if (Utils.testDateNulleForTimstamp(deletedAT)) {
-			deletedAT = null;
-		} **/
 		
 		final Account account = new Account(id, id_global, username, email, password, faction, createdAT, updatedAT, deletedAT);
 		return account;
@@ -272,8 +260,6 @@ public class AccountDao {
 			Calendar calendar = Calendar.getInstance();
 			Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
-			System.out.println("FACTION = " + account.getFaction());
-			// create the mysql insert preparedstatement
 			stmt = con.prepareStatement(QUERY_INSERT);
 			stmt.setString(1, account.getGlobalID());
 			stmt.setString(2, account.getFaction());
@@ -311,7 +297,7 @@ public class AccountDao {
 		return errorInsert;
 	}
 	
-	
+	/*
 	public Account getAccounByUid(String uid) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -351,7 +337,7 @@ public class AccountDao {
 		return account;
 	}
 	
-	
+	*/
 	public Account getAccountByUsername(String username) {
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -392,6 +378,7 @@ public class AccountDao {
 		return account;
 	}
 
+/*
 	public Boolean motDePasseAChanger(String username){
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -430,6 +417,7 @@ public class AccountDao {
 		
 		return flag;
 	}
+	*/
 	
 	/**
 	 * Permet de créer une ligne dans la table NOUVEAU_MDP (gestion de la génération des nouveaux mot de passe) 

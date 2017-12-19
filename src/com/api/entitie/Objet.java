@@ -51,7 +51,7 @@ public class Objet {
 		this.type_objet = type_objet;
 	}
 	
-	public JSONObject getJson() {
+	public JSONObject getJsonForApi() {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("id_objet", this.id_objet);
