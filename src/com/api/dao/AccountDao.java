@@ -18,7 +18,7 @@ import com.api.entitie.Account;
  */
 public class AccountDao {
 
-	final static Logger logger = Logger.getLogger(AccountDao.class.getName()); 
+	final static Logger logger = Logger.getLogger(AccountDao.class.getName());
 
 	// requetes
 	private final static String QUERY_FIND_BY_MAIL = "SELECT * FROM ACCOUNT WHERE email = ?";
@@ -27,10 +27,10 @@ public class AccountDao {
 	private final static String INSERT_MOT_DE_PASSE_BY_ID = "INSERT INTO NOUVEAU_MDP (ID, FLAG) values (?, ?)";
 	private final static String QUERY_UPDATE_MOT_DE_PASSE_BY_ID = "UPDATE NOUVEAU_MDP SET FLAG = ? WHERE id = ?";
 	private final static String QUERY_FIND_BY_USERNAME = "SELECT * FROM ACCOUNT WHERE USERNAME = ?";
-	
+
 	/**
-	 * Recherche le compte en fonction de son mail. Retourne <code>null</code>
-	 * si pas de résultat
+	 * Recherche le compte en fonction de son mail. Retourne <code>null</code> si
+	 * pas de résultat
 	 * 
 	 * @param mail
 	 * @return account
@@ -41,7 +41,7 @@ public class AccountDao {
 
 		Account account = new Account();
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(QUERY_FIND_BY_MAIL);
 			stmt.setString(1, mail);
@@ -51,7 +51,7 @@ public class AccountDao {
 			while (rset.next()) {
 				account = mappingAccount(rset);
 			}
-			//erreurs
+			// erreurs
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -71,15 +71,17 @@ public class AccountDao {
 				}
 			}
 		}
-		
-		if (account.getId() == 0){
+
+		// si pas de compte
+		if (account.getId() == 0) {
 			return null;
 		}
 		return account;
 	}
-	
+
 	/**
 	 * Permet de modifier un mot de passe en fonction de l'id du compte
+	 * 
 	 * @param id
 	 * @param password
 	 * @return <code>true</code> si erreur ou code>false</code si pas d'erreur
@@ -89,24 +91,24 @@ public class AccountDao {
 		PreparedStatement stmt = null;
 		Boolean errorUpdate = false;
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(QUERY_UPDATE_PASSWORD_BY_ID);
 			Calendar calendar = Calendar.getInstance();
 
 			Date modifiedDate = new java.sql.Date(calendar.getTime().getTime());
 
-			//preparation
+			// preparation
 			stmt.setString(1, password);
-			stmt.setDate(2,modifiedDate);
+			stmt.setDate(2, modifiedDate);
 			stmt.setInt(3, id);
 
 			stmt.executeUpdate();
-			//erreurs
+			// erreurs
 		} catch (SQLException e) {
 			errorUpdate = true;
 			e.printStackTrace();
-			
+
 		} finally {
 			if (stmt != null) {
 				try {
@@ -124,13 +126,13 @@ public class AccountDao {
 				}
 			}
 		}
-		
+
 		return errorUpdate;
 	}
-	
+
 	/**
-	 * Permet de mettre à jour la table NOUVEAU_MDP (gestion de la génération
-	 * des nouveaux mot de passe)
+	 * Permet de mettre à jour la table NOUVEAU_MDP (gestion de la génération des
+	 * nouveaux mot de passe)
 	 * 
 	 * @param id
 	 * @param flag
@@ -142,20 +144,20 @@ public class AccountDao {
 		PreparedStatement stmt = null;
 		Boolean errorUpdate = false;
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(QUERY_UPDATE_MOT_DE_PASSE_BY_ID);
-		
-			//preparation
+
+			// preparation
 			stmt.setString(1, Flag);
 			stmt.setInt(2, id);
 
 			stmt.executeUpdate();
-			//erreurs
+			// erreurs
 		} catch (SQLException e) {
 			errorUpdate = true;
 			e.printStackTrace();
-			
+
 		} finally {
 			if (stmt != null) {
 				try {
@@ -173,7 +175,7 @@ public class AccountDao {
 				}
 			}
 		}
-		
+
 		return errorUpdate;
 	}
 
@@ -191,15 +193,16 @@ public class AccountDao {
 		final String email = rset.getString("email");
 		final String password = rset.getString("password");
 		final String faction = rset.getString("faction");
-		
+
 		Timestamp createdAT = rset.getTimestamp("created_at");
 		Timestamp updatedAT = rset.getTimestamp("updated_at");
 		Timestamp deletedAT = rset.getTimestamp("deleted_at");
-		
-		final Account account = new Account(id, id_global, username, email, password, faction, createdAT, updatedAT, deletedAT);
+
+		final Account account = new Account(id, id_global, username, email, password, faction, createdAT, updatedAT,
+				deletedAT);
 		return account;
 	}
-	
+
 	/**
 	 * Permet d'insérer une nouvelle ligne dans la table ACCOUNT
 	 * 
@@ -213,14 +216,14 @@ public class AccountDao {
 		Boolean errorInsert = false;
 
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			Calendar calendar = Calendar.getInstance();
 			Date startDate = new java.sql.Date(calendar.getTime().getTime());
 
-			//preparation
+			// preparation
 			stmt = con.prepareStatement(QUERY_INSERT);
-			stmt.setString(1, account.getGlobalID());
+			stmt.setString(1, account.getId_global());
 			stmt.setString(2, account.getFaction());
 			stmt.setString(3, account.getUsername());
 			stmt.setString(4, account.getPassword());
@@ -230,12 +233,12 @@ public class AccountDao {
 			stmt.setDate(8, null);
 
 			stmt.execute();
-			
+
 			// creation du flag dans la table NOUVEAU_MDP
 			Account accountInsere = getAccountByMail(account.getEmail());
 			createFlag(accountInsere.getId(), "N");
-			
-			//erreurs
+
+			// erreurs
 		} catch (SQLException e) {
 			e.printStackTrace();
 			errorInsert = true;
@@ -258,10 +261,10 @@ public class AccountDao {
 		}
 		return errorInsert;
 	}
-	
+
 	/**
-	 * Recherche le compte en fonction de son username. Retourne
-	 * <code>null</code> si pas de résultat
+	 * Recherche le compte en fonction de son username. Retourne <code>null</code>
+	 * si pas de résultat
 	 * 
 	 * @param username
 	 * @return account
@@ -272,7 +275,7 @@ public class AccountDao {
 
 		Account account = new Account();
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(QUERY_FIND_BY_USERNAME);
 			stmt.setString(1, username.toLowerCase());
@@ -282,7 +285,7 @@ public class AccountDao {
 			while (rset.next()) {
 				account = mappingAccount(rset);
 			}
-			//erreur
+			// erreur
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -302,38 +305,41 @@ public class AccountDao {
 				}
 			}
 		}
-		
-		if (account.getId() == 0){
+
+		if (account.getId() == 0) {
 			return null;
 		}
 		return account;
 	}
-	
+
 	/**
-	 * Permet de créer une ligne dans la table NOUVEAU_MDP (gestion de la génération des nouveaux mot de passe) 
+	 * Permet de créer une ligne dans la table NOUVEAU_MDP (gestion de la génération
+	 * des nouveaux mot de passe)
+	 * 
 	 * @param id
 	 * @param flag
-	 * @return <code>true</code> si tout est ok et <code>false</code> en cas d'erreur
+	 * @return <code>true</code> si tout est ok et <code>false</code> en cas
+	 *         d'erreur
 	 */
 	public Boolean createFlag(int id, String flag) {
 		Connection con = null;
 		PreparedStatement stmt = null;
 		Boolean errorUpdate = false;
 		try {
-			//connexion
+			// connexion
 			con = Connecteur.getConnexion();
 			stmt = con.prepareStatement(INSERT_MOT_DE_PASSE_BY_ID);
-			stmt.setInt(1, id);		
+			stmt.setInt(1, id);
 			stmt.setString(2, flag);
 
-			//execution
+			// execution
 			stmt.executeUpdate();
-			
-			//erreurs
+
+			// erreurs
 		} catch (SQLException e) {
 			errorUpdate = true;
 			e.printStackTrace();
-			
+
 		} finally {
 			if (stmt != null) {
 				try {
@@ -351,7 +357,7 @@ public class AccountDao {
 				}
 			}
 		}
-		
+
 		return errorUpdate;
 	}
 }

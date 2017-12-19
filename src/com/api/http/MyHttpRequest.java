@@ -19,33 +19,34 @@ import org.codehaus.jettison.json.JSONObject;
  * Classe permettant de gérer les appels HTTP(S) sur les autres API
  */
 public class MyHttpRequest {
-	
+
 	/**
 	 * Constructeur par défaut
 	 */
 	public MyHttpRequest() {
-		
+
 	}
+
 	private static final Logger logger = Logger.getLogger(MyHttpRequest.class.getName());
-	
+
 	/**
 	 * Permet de créer une requête HTTP GET
 	 * 
 	 * @param url
 	 * @return JSONObject
 	 */
-	public JSONObject getJsonByHttp (String urlHttp) {
-		
+	public JSONObject getJsonByHttp(String urlHttp) {
+
 		JSONObject jObject = new JSONObject();
-		
+
 		try {
-			//connexion
+			// connexion
 			URL url = new URL(urlHttp);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
-			
+
 			int responseCode = con.getResponseCode();
-			System.out.println("Retour"+responseCode);
+			System.out.println("Retour" + responseCode);
 
 			// traitement en fonction de la réponse
 			if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -62,7 +63,7 @@ public class MyHttpRequest {
 				jObject = new JSONObject(response.toString());
 
 			} else {
-				
+
 			}
 		} catch (ConnectException e) {
 			e.printStackTrace();
@@ -73,10 +74,10 @@ public class MyHttpRequest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return jObject;
 	}
-	
+
 	/**
 	 * Permet de créer une requête HTTP GET avec un TOKEN dans l'en-tête
 	 * 
@@ -84,18 +85,18 @@ public class MyHttpRequest {
 	 * @param token
 	 * @return JSONObject
 	 */
-	public JSONObject getJsonByHttpWithToken (String urlHttp, String token) {
-		
+	public JSONObject getJsonByHttpWithToken(String urlHttp, String token) {
+
 		JSONObject jObject = new JSONObject();
-		
+
 		try {
-			//connexion
+			// connexion
 			URL url = new URL(urlHttp);
-			
+
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
-			con.setRequestProperty ("Authorization", token);
-			
+			con.setRequestProperty("Authorization", token);
+
 			int responseCode = con.getResponseCode();
 			// traitement en fonction de la réponse
 			if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -111,7 +112,7 @@ public class MyHttpRequest {
 				jObject = new JSONObject(response.toString());
 
 			} else {
-				
+
 			}
 		} catch (ConnectException e) {
 			e.printStackTrace();
@@ -122,41 +123,40 @@ public class MyHttpRequest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return jObject;
 	}
 
 	/**
-	 * Permet de créer une requête HTTP POST avec des paramètre JSON dans le
-	 * body
+	 * Permet de créer une requête HTTP POST avec des paramètre JSON dans le body
 	 * 
 	 * @param url
 	 * @param json
 	 * @return JSONObject
 	 */
-	public JSONObject getJsonByPostWithJsonBody (String url, org.json.simple.JSONObject jsonObject) {
-		
+	public JSONObject getJsonByPostWithJsonBody(String url, org.json.simple.JSONObject jsonObject) {
+
 		JSONObject jsonObjectReponse = new JSONObject();
 
 		try {
-			//connexion
+			// connexion
 			URL obj = new URL(url);
-			
+
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			
+
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-			con.setRequestProperty("Content-Type","application/json");
+			con.setRequestProperty("Content-Type", "application/json");
 
 			con.setDoOutput(true);
-			
+
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(jsonObject.toString());
 			wr.flush();
 			wr.close();
-			
-			//en fonction de la réponse
-			int responseCode = con.getResponseCode();			
+
+			// en fonction de la réponse
+			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String output;
@@ -166,7 +166,7 @@ public class MyHttpRequest {
 					response.append(output);
 				}
 				in.close();
-				
+
 				jsonObjectReponse = new JSONObject(response.toString());
 			} else {
 
@@ -178,44 +178,44 @@ public class MyHttpRequest {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		return jsonObjectReponse;
 	}
-	
+
 	/**
-	 * Permet de créer une requête HTTP POST avec des paramètre JSON dans le
-	 * body et un token dans l'en-tête 
+	 * Permet de créer une requête HTTP POST avec des paramètre JSON dans le body et
+	 * un token dans l'en-tête
 	 * 
 	 * @param url
 	 * @param json
 	 * @param token
 	 * @return JSONObject
 	 */
-	public JSONObject getJsonByPostWithJsonBodyHttpsAndToken (String url, org.json.simple.JSONObject jsonObject, String token) {
-		
+	public JSONObject getJsonByPostWithJsonBodyHttpsAndToken(String url, org.json.simple.JSONObject jsonObject,
+			String token) {
+
 		JSONObject jsonObjectReponse = new JSONObject();
 
 		try {
-			//connexion
+			// connexion
 			URL obj = new URL(url);
-			
+
 			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
-			
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-			con.setRequestProperty("Content-Type","application/json");
-			con.setRequestProperty ("Authorization", token);
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Authorization", token);
 
 			con.setDoOutput(true);
-			
+
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(jsonObject.toString());
 			wr.flush();
 			wr.close();
-			
+
 			// traitement en fonction de la réponse
-			int responseCode = con.getResponseCode();			
+			int responseCode = con.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String output;
@@ -225,7 +225,7 @@ public class MyHttpRequest {
 					response.append(output);
 				}
 				in.close();
-				
+
 				jsonObjectReponse = new JSONObject(response.toString());
 			} else {
 
@@ -237,7 +237,7 @@ public class MyHttpRequest {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		return jsonObjectReponse;
 	}
 

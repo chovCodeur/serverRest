@@ -5,7 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import com.api.utils.Utils;
 
-/** 
+/**
  * Classe permettant la gestion des bonus table INVENTAIRE, OBJET, RECETTE
  */
 public class Bonus {
@@ -14,14 +14,16 @@ public class Bonus {
 	String description_recette;
 	int puissance_objet;
 	String type_objet;
-	
+
 	/**
 	 * Constructeur par défaut
 	 */
-	public Bonus () {
+	public Bonus() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -30,7 +32,7 @@ public class Bonus {
 				+ ", puissance_objet=" + puissance_objet + ", type_objet=" + type_objet + ", nom_recette=" + nom_recette
 				+ "]";
 	}
-	
+
 	/**
 	 * Constructeur
 	 * 
@@ -50,82 +52,102 @@ public class Bonus {
 		this.type_objet = type_objet;
 		this.nom_recette = nom_recette;
 	}
+
 	String nom_recette;
+
 	/**
 	 * @return the id_objet
 	 */
 	public int getId_objet() {
 		return id_objet;
 	}
+
 	/**
-	 * @param id_objet the id_objet to set
+	 * @param id_objet
+	 *            the id_objet to set
 	 */
 	public void setId_objet(int id_objet) {
 		this.id_objet = id_objet;
 	}
+
 	/**
 	 * @return the qte
 	 */
 	public int getQte() {
 		return qte;
 	}
+
 	/**
-	 * @param qte the qte to set
+	 * @param qte
+	 *            the qte to set
 	 */
 	public void setQte(int qte) {
 		this.qte = qte;
 	}
+
 	/**
 	 * @return the nom_recette
 	 */
 	public String getNom_recette() {
 		return nom_recette;
 	}
+
 	/**
-	 * @param nom_recette the nom_recette to set
+	 * @param nom_recette
+	 *            the nom_recette to set
 	 */
 	public void setNom_recette(String nom_recette) {
 		this.nom_recette = nom_recette;
 	}
+
 	/**
 	 * @return the description_recette
 	 */
 	public String getDescription_recette() {
 		return description_recette;
 	}
+
 	/**
-	 * @param description_recette the description_recette to set
+	 * @param description_recette
+	 *            the description_recette to set
 	 */
 	public void setDescription_recette(String description_recette) {
 		this.description_recette = description_recette;
 	}
+
 	/**
 	 * @return the puissance_objet
 	 */
 	public int getPuissance_objet() {
 		return puissance_objet;
 	}
+
 	/**
-	 * @param puissance_objet the puissance_objet to set
+	 * @param puissance_objet
+	 *            the puissance_objet to set
 	 */
 	public void setPuissance_objet(int puissance_objet) {
 		this.puissance_objet = puissance_objet;
 	}
+
 	/**
 	 * @return the type_objet
 	 */
 	public String getType_objet() {
 		return type_objet;
 	}
+
 	/**
-	 * @param type_objet the type_objet to set
+	 * @param type_objet
+	 *            the type_objet to set
 	 */
 	public void setType_objet(String type_objet) {
 		this.type_objet = type_objet;
 	}
-	
+
 	/**
 	 * Permet de retourner un JSON au format conventionnel pour les autres jeux
+	 * 
 	 * @return JSON
 	 */
 	public JSONObject getJsonForApi() {
@@ -140,7 +162,7 @@ public class Bonus {
 				json.put("description", this.description_recette);
 			}
 			json.put("qte", this.qte);
-			
+
 			// en fonction du type
 			if (this.nom_recette.contains("soins")) {
 				json.put("type", "health");
@@ -159,7 +181,7 @@ public class Bonus {
 			} else if (this.nom_recette.contains("bois")) {
 				json.put("type", "bois");
 			}
-			
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

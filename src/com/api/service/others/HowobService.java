@@ -31,10 +31,11 @@ public class HowobService {
     private static ResourceBundle applicationProperties = ResourceBundle.getBundle("application");
 
     /**
-     * Permet d'indiquer les potions disponibles pour un joueur dans howob
-     * @param uuid
-     * @return json
-     */
+	 * Permet d'indiquer les potions disponibles pour un joueur dans howob
+	 * 
+	 * @param uuid
+	 * @return json
+	 */
 	@GET
 	@Path("/potions/{uuid}")
 	@Produces(MediaType.APPLICATION_JSON)
