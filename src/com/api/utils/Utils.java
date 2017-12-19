@@ -3,7 +3,6 @@ package com.api.utils;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.util.ResourceBundle;
 
 import org.codehaus.jettison.json.JSONException;

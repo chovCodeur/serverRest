@@ -5,16 +5,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
+
 import com.api.bd.Connecteur;
 import com.api.entitie.Account;
-import com.api.utils.Utils;
 
 /**
  * Classe permettant la gestion des ACCOUNTS

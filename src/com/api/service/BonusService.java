@@ -1,7 +1,5 @@
 package com.api.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -20,10 +18,6 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.api.dao.AccountDao;
-import com.api.dao.BonusDao;
-import com.api.entitie.Account;
-import com.api.entitie.Bonus;
 import com.api.http.MyHttpRequest;
 import com.api.utils.Utils;
 

@@ -1,15 +1,12 @@
 package com.api.service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -17,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -25,7 +21,6 @@ import com.api.dao.AccountDao;
 import com.api.entitie.Account;
 import com.api.http.MyHttpRequest;
 import com.api.utils.Utils;
-import com.sun.jersey.json.impl.provider.entity.JSONListElementProvider;
 
 /**
  * Classe permettant d'exposer les services en rapport avec la table ACCOUNT
