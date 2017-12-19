@@ -4,27 +4,33 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.ResourceBundle;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+/**
+ * Classe utils permettant de mettre à diposition des outils
+ */
 public final class Utils {
 	
-	public static String SALT = "3iLh3nalluX";
+    private static ResourceBundle applicationProperties = ResourceBundle.getBundle("application");
+	
+    /**
+     * On controle une string avant de la mettre dans un json
+     * @param string
+     * @return <code>true</code> si conforme, <code>false</code> sinon
+     */
 	public static Boolean testStringForJson (String string) {
 		return (string!= null && !string.equals(""));
 	}
 	
-	public static Boolean testDateNulleForTimstamp (Timestamp timestamp) {
-		Timestamp reference = new Timestamp(0);
-		if (reference.equals(timestamp)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
+	/**
+	 * Permet de convertir une string en JSON
+	 * @param string
+	 * @return json
+	 */
 	public static org.json.simple.JSONObject parseJsonObject (String s) {
 		org.json.simple.JSONObject json = new org.json.simple.JSONObject();
         try {
@@ -35,6 +41,13 @@ public final class Utils {
 		return json;
 	}
 	
+	/**
+	 * Permet de retourner un message d'erreur uniforme en fonction du message et du code passé
+	 * @param name
+	 * @param code
+	 * @param message
+	 * @return json
+	 */
 	public static JSONObject getJsonError(String name, int code, String message) {
 		JSONObject json = new JSONObject();
 		JSONObject jsonTemp = new JSONObject();
@@ -50,19 +63,6 @@ public final class Utils {
 		return json;
 	}
 	
-	public static JSONObject getJsonErrorGenerale() {
-		JSONObject json = new JSONObject();
-		try {
-			json.put("name", "Error");
-			json.put("message", "Erreur interne de l'API VeggieCrush");
-			json.put("err", 500);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return json;
-	}
-	
-	
 	/**
 	 * Permet de crypter le mot de passe avec SHA-512 et la clef commune
 	 * @param passwordToHash
@@ -71,9 +71,13 @@ public final class Utils {
 	public static String get_SHA_512_SecurePassword(String passwordToHash) {
 		String generatedPassword = null;
 		try {
+			// instance de cryptage
 			MessageDigest md = MessageDigest.getInstance("SHA-512");
-			md.update(SALT.getBytes("UTF-8"));
+			// Grain de sel externalisé dans un fichier de configuration
+			md.update(applicationProperties.getString("bd.pass.salt").getBytes("UTF-8"));
 			byte[] bytes = md.digest(passwordToHash.getBytes("UTF-8"));
+			
+			// on construit le mot de passe
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < bytes.length; i++) {
 				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));

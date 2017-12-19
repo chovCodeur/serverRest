@@ -5,6 +5,9 @@ import org.codehaus.jettison.json.JSONObject;
 
 import com.api.utils.Utils;
 
+/** 
+ * Classe permettant la gestion des bonus table INVENTAIRE, OBJET, RECETTE
+ */
 public class Bonus {
 	int id_objet;
 	int qte;
@@ -12,11 +15,15 @@ public class Bonus {
 	int puissance_objet;
 	String type_objet;
 	
-	
+	/**
+	 * Constructeur par défaut
+	 */
 	public Bonus () {
-		
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "Bonus [id_objet=" + id_objet + ", qte=" + qte + ", description_recette=" + description_recette
@@ -25,6 +32,8 @@ public class Bonus {
 	}
 	
 	/**
+	 * Constructeur
+	 * 
 	 * @param id_objet
 	 * @param qte
 	 * @param description_recette
@@ -115,15 +124,24 @@ public class Bonus {
 		this.type_objet = type_objet;
 	}
 	
+	/**
+	 * Permet de retourner un JSON au format conventionnel pour les autres jeux
+	 * @return JSON
+	 */
 	public JSONObject getJsonForApi() {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("id", this.id_objet);
 			json.put("puissance", this.puissance_objet);
-			if (Utils.testStringForJson(this.nom_recette)) json.put("nom", this.nom_recette);
-			if (Utils.testStringForJson(this.description_recette)) json.put("description", this.description_recette);
+			if (Utils.testStringForJson(this.nom_recette)) {
+				json.put("nom", this.nom_recette);
+			}
+			if (Utils.testStringForJson(this.description_recette)) {
+				json.put("description", this.description_recette);
+			}
 			json.put("qte", this.qte);
 			
+			// en fonction du type
 			if (this.nom_recette.contains("soins")) {
 				json.put("type", "health");
 			} else if (this.nom_recette.contains("magique")) {
