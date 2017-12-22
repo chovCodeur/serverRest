@@ -46,7 +46,6 @@ public class MyHttpRequest {
 			con.setRequestMethod("GET");
 
 			int responseCode = con.getResponseCode();
-			System.out.println("Retour" + responseCode);
 
 			// traitement en fonction de la réponse
 			if (responseCode == HttpURLConnection.HTTP_OK) {

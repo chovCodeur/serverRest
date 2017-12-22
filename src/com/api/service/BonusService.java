@@ -60,16 +60,18 @@ public class BonusService {
 		// on interroge l'autre API
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		JSONObject json = myHttpRequest
-				.getJsonByHttp(applicationProperties.getString("bonus.boomcraft") + "\"" + uuid + "\"");
-
+				.getJsonByHttp(applicationProperties.getString("bonus.boomcraft") + uuid );
+		
 		JSONObject jsonRetour = new JSONObject();
 		int qte = 0;
 		// si au moins une quantité, on retourne true, false sinon
 		try {
-			if (!json.isNull("bonus") && !json.getJSONObject("bonus").isNull("quantite")) {
-				qte = Integer.valueOf((String) json.getJSONObject("bonus").get("quantite"));
+			if (!json.isNull("qte")) {
+				qte = json.getInt("qte");
 			}
+			
 			if (qte > 0) {
+				
 				jsonRetour.put("boomcraft", true);
 			} else {
 				jsonRetour.put("boomcraft", false);
@@ -79,11 +81,6 @@ public class BonusService {
 			e.printStackTrace();
 		}
 
-		try {
-			jsonRetour.put("boomcraft", false);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 		return Response.status(200).entity(jsonRetour.toString()).build();
 	}
 
@@ -165,7 +162,7 @@ public class BonusService {
 		// on interroge l'autre API
 		MyHttpRequest myHttpRequest = new MyHttpRequest();
 		JSONObject json = myHttpRequest.getJsonByHttpWithToken(applicationProperties.getString("bonus.howob") + uuid,
-				applicationProperties.getString("bonus.wobob.veggie.token"));
+				applicationProperties.getString("bonus.howob.veggie.token"));
 
 		JSONObject jsonRetour = new JSONObject();
 		int qte = 0;

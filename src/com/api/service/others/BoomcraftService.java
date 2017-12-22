@@ -88,7 +88,7 @@ public class BoomcraftService {
 		if (jsonEnvoi.containsKey("id") && jsonEnvoi.get("id") != null) {
 			Long id = (Long) jsonEnvoi.get("id");
 			idPotion = id.intValue();
-			if (idPotion == 0) {
+			if (idPotion <= 0) {
 				return Response.status(200)
 						.entity(Utils
 								.getJsonError("error", 500,
