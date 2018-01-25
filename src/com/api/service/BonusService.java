@@ -235,7 +235,7 @@ public class BonusService {
 				jsonRetour.put("qte", 1);
 				myHttpRequest.getJsonByPostWithJsonBodyHttpsAndToken(
 						applicationProperties.getString("notifier.bonus.howob") + uuid, jsonRetour,
-						applicationProperties.getString("bonus.wobob.veggie.token"));
+						applicationProperties.getString("bonus.howob.veggie.token"));
 			}
 		}
 
